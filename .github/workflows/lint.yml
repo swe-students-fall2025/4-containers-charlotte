@@ -7,13 +7,17 @@ jobs:
     strategy:
       matrix:
         # repeat same job for each subsystem in the following subdirectories
-        subdir: [web-app, machine-learning-client]
+        include:
+        - subdir: web-app
+          python: "3.13"
+        - subdir: machine-learning-client
+          python: "3.10"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10" # update version(s) as needed
+          python-version: ${{ matrix.python }} # update version(s) as needed
       - name: Install dependencies
         if: ${{ hashFiles(format('{0}/**/*.py', matrix.subdir)) != '' }}
         run: |
