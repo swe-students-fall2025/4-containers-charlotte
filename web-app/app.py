@@ -5,6 +5,7 @@ import pathlib
 from typing import Optional
 
 import models
+from auth import auth_bp
 from bson.objectid import ObjectId
 from db import db
 from dotenv import load_dotenv
@@ -27,6 +28,9 @@ def load_user(user_id: str) -> Optional[models.User]:
     if not user_data:
         return None
     return models.User(user_data)
+
+
+app.register_blueprint(auth_bp)
 
 
 if __name__ == "__main__":

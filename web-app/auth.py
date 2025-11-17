@@ -1,13 +1,14 @@
 """Authorization module for the web app"""
 
 import models
-from app import app
 from db import db
-from flask import flash, request
+from flask import Blueprint, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
+auth_bp = Blueprint("auth", __name__)
 
-@app.route("/login", methods=["GET", "POST"])
+
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """Login route"""
 
@@ -20,17 +21,17 @@ def login():
         if not username or not password:
             flash("Please provide both a username and password", "error")
 
-        user = db.users.find_one({"username": username})
+        user = models.User(db.users.find_one({"username": username}))
         if user and user.check_password(password):
             login_user(user)
             flash("Logged in successfully!", "success")
-            return "User logged in" + user
+            return f"User logged in {user.username}"
 
         flash("Login Unsuccessful. Please check username and password", "danger")
     return "Login Page"
 
 
-@app.route("/register", methods=["GET", "POST"])
+@auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     """Register a new user"""
 
@@ -45,14 +46,15 @@ def register():
         else:
             user = models.User({"username": username})
             user.set_password(password)
-            inserted_id = db.users.insert_one(user)
-            login_user(db.users.find_one({"_id": inserted_id}))
+            inserted_id = db.users.insert_one(user.to_dict())
+            login_user(models.User(db.users.find_one({"_id": inserted_id.inserted_id})))
             flash("Logged in successfully!", "success")
-            return "User logged in" + user
-    return "Reigstration page"
+            print("HELLOOO")
+            return f"User logged in {user.username}"
+    return "Registration page"
 
 
-@app.route("/logout")
+@auth_bp.route("/logout")
 @login_required
 def logout():
     """Logout current logged in user"""
