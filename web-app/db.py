@@ -1,3 +1,5 @@
+"""Database operations for the web app"""
+
 import os
 from pymongo import MongoClient
 
@@ -7,3 +9,4 @@ def get_history_collection():
     client = MongoClient(uri)
     db = client[db_name]
     return db["history"]
+
