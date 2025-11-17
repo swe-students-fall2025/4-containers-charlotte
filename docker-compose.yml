@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  web:
+    build:
+      context: ./web-app
+    container_name: web-app
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB: ${MONGO_DB}
+    ports:
+      - "5000:5000"
+
+  ml:
+    build:
+      context: ./machine-learning-client
+    container_name: ml-client
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB: ${MONGO_DB}
+      SOURCE_LANG: ${SOURCE_LANG}
+      TARGET_LANG: ${TARGET_LANG}
+
+volumes:
+  mongo-data:
