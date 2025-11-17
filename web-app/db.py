@@ -10,5 +10,5 @@ DIR = pathlib.Path(__file__).parent
 
 load_dotenv(DIR / ".env", override=True)
 
-client = MongoClient(os.getenv("DATABASE_URI"))
-db = client.get_database(os.getenv("DATABASE_NAME"))
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client.get_database(os.getenv("MONGO_DB"))
