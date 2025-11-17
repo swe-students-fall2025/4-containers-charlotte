@@ -4,13 +4,14 @@ import os
 import pathlib
 from typing import Optional
 
-import models
-from auth import auth_bp
 from bson.objectid import ObjectId
-from db import db
 from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager
+
+import models
+from auth import auth_bp
+from db import db
 
 DIR = pathlib.Path(__file__).parent
 

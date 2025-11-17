@@ -1,9 +1,10 @@
 """Authorization module for the web app"""
 
-import models
-from db import db
 from flask import Blueprint, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
+
+import models
+from db import db
 
 auth_bp = Blueprint("auth", __name__)
 
