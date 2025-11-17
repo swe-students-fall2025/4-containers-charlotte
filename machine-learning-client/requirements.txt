@@ -1,0 +1,22 @@
+# ML dependencies
+openai-whisper
+torch
+torchaudio
+numpy==1.22.0
+
+# OpenVoice dependencies
+librosa==0.9.1
+pydub==0.25.1
+wavmark==0.0.3
+
+# Database
+pymongo
+
+# Utilities
+python-dotenv
+
+# Code quality
+pylint
+black
+pytest
+pytest-cov
