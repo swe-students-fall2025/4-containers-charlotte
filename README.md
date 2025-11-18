@@ -25,30 +25,52 @@ Everything runs in three Docker containers, orchestrated with `docker-compose`:
 - `mongodb` (database)
 
 ---
-Prerequisites
+## Prerequisites
 
-Git
+Before running the system, ensure the following tools and resources are installed on your machine:
 
-Docker & Docker Compose
-(Docker Desktop on macOS/Windows; Docker Engine + Compose on Linux)
+### Required Software
+- **Git** — for version control and cloning the repository.
+- **Docker & Docker Compose**
+  - Docker Desktop (macOS/Windows), or
+  - Docker Engine + Docker Compose plugin (Linux)
+- **Python 3.10+** (optional, only needed for local development outside of Docker)
+- **pip** or **pipenv** — for managing Python packages during local testing.
 
-Python 3.10+ if you want to run things locally (outside of Docker)
+### Hardware & Storage Requirements
+- Enough disk space to store:
+  - Whisper model weights (from 150 MB to 3 GB depending on model size)
+  - OpenVoice checkpoints (typically 500 MB – 1.5 GB)
+  - Processed audio outputs (user-generated)
 
-pip or pipenv
+### Machine Learning Model Dependencies
 
-Enough disk space to host Whisper + OpenVoice model weights
+The machine learning client requires several ML libraries (installed automatically inside the Docker container):
 
-Model installation (high level):
 
-Install Whisper (e.g. openai-whisper or equivalent).
+During Docker image build, these packages are installed based on  
+**machine-learning-client/requirements.txt**.
 
-Install OpenVoice and ensure models/checkpoints are either:
+### Model Installation Notes
 
-downloaded at container build time, or
+The ML container must have access to the pretrained model files:
 
-mounted as a volume into the ML container.
+1. **Whisper model**
+   - Automatically downloaded at runtime on first use, *OR*
+   - Pre-downloaded and mounted into the container for faster inference.
 
-Exact install details live in machine-learning-client/requirements.txt and Dockerfile.
+2. **OpenVoice model**
+   - Checkpoint and config files must be:
+     - downloaded during image build, *or*
+     - stored in a `/models` directory and mounted as a volume:
+       ```yaml
+       volumes:
+         - ml-models:/models
+       ```
+
+Your actual model locations are configured through environment variables (see next section).
+
+
 ---
 
 ## System Architecture
