@@ -1,25 +1,15 @@
-<<<<<<< HEAD
 """Authorization module for the web app"""
 
 from flask import Blueprint, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
 import models
-from db import db
+from db import get_history_collection
 
 auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-=======
-import models
-from app import app, mongo
-from flask import flash, request
-from flask_login import current_user, login_required, login_user, logout_user
-
-
-@app.route("/login", methods=["GET", "POST"])
->>>>>>> 70e27e2 (Added template logic for login)
 def login():
     """Login route"""
 
@@ -29,17 +19,26 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
         if not username or not password:
             flash("Please provide both a username and password", "error")
 
-<<<<<<< HEAD
-        user = models.User(db.users.find_one({"username": username}))
-        if user and user.check_password(password):
+        db = get_history_collection().database
+        user_data = db.users.find_one({"username": username})
+
+        if not user_data:
+            flash("Login unsuccessful. Please check username and password.", "danger")
+            return "Login Page"
+
+        user = models.User(user_data)
+
+        if user.check_password(password):
             login_user(user)
             flash("Logged in successfully!", "success")
             return f"User logged in {user.username}"
 
-        flash("Login Unsuccessful. Please check username and password", "danger")
+        flash("Login unsuccessful. Please check username and password.", "danger")
+
     return "Login Page"
 
 
@@ -49,20 +48,28 @@ def register():
 
     if current_user.is_authenticated:
         return "User is already authenticated"
+
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
+        db = get_history_collection().database
         existing_user = db.users.find_one({"username": username})
+
         if existing_user:
             flash("Username already exists. Please choose a different one.", "warning")
+
         else:
             user = models.User({"username": username})
             user.set_password(password)
-            inserted_id = db.users.insert_one(user.to_dict())
-            login_user(models.User(db.users.find_one({"_id": inserted_id.inserted_id})))
-            flash("Logged in successfully!", "success")
-            print("HELLOOO")
-            return f"User logged in {user.username}"
+
+            inserted = db.users.insert_one(user.data)
+            new_user = db.users.find_one({"_id": inserted.inserted_id})
+
+            login_user(models.User(new_user))
+            flash("Registered and logged in successfully!", "success")
+            return f"User logged in {username}"
+
     return "Registration page"
 
 
@@ -70,47 +77,6 @@ def register():
 @login_required
 def logout():
     """Logout current logged in user"""
-=======
-        user = mongo.db.users.find_one({"username": username})
-        if user and user.check_password(password):
-            login_user(user)
-            flash("Logged in successfully!", "success")
-            return "User logged in" + user
-        else:
-            flash(
-                "Login Unsuccessful. Please check username and password",
-                "danger"
-            )
-    return "Login Page"
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if current_user.is_authenticated:
-        "User is already authenticated"
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        existing_user = mongo.db.users.find_one({"username": username})
-        if existing_user:
-            flash(
-                "Username already exists. Please choose a different one.",
-                "warning"
-            )
-        else:
-            user = models.User(username=username)
-            user.set_password(password)
-            inserted_id = mongo.db.users.insert_one(user)
-            login_user(mongo.db.users.find_one({"_id": inserted_id}))
-            flash("Logged in successfully!", "success")
-            return "User logged in" + user
-    return "Reigstration page"
-
-
-@app.route("/logout")
-@login_required
-def logout():
->>>>>>> 70e27e2 (Added template logic for login)
     logout_user()
     flash("You have been logged out.", "info")
     return "User has been logged out"
