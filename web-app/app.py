@@ -11,7 +11,7 @@ from flask_login import LoginManager
 
 import models
 from auth import auth_bp
-from db import get_history_collection  # Updated import
+from db import db
 
 DIR = pathlib.Path(__file__).parent
 
@@ -27,8 +27,8 @@ login_manager = LoginManager(app)
 @login_manager.user_loader
 def load_user(user_id: str) -> Optional[models.User]:
     """Load currently logged-in user data"""
-    history_collection = get_history_collection()
-    user_data = history_collection.database.users.find_one({"_id": ObjectId(user_id)})
+
+    user_data = db.users.find_one({"_id": ObjectId(user_id)})
 
     if not user_data:
         return None
@@ -42,6 +42,8 @@ app.register_blueprint(auth_bp)
 
 @app.route("/")
 def index():
+    """Landing page"""
+
     return "Web App Running"
 
 
