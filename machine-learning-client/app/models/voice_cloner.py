@@ -162,7 +162,7 @@ class VoiceCloner:
             logger.warning('Falling back to mock mode')
             return self._mock_clone(text, output_path)
 
-    def _mock_clone(self, text, output_path):
+    def _mock_clone(self, output_path):
         '''
         Create a placeholder audio file for testing.
 
