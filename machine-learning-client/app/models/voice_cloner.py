@@ -118,7 +118,7 @@ class VoiceCloner:
                 reference_audio, text, target_language, output_path
             )
         else:
-            output_path = self._mock_clone(text, output_path)
+            output_path = self._mock_clone(output_path)
 
         logger.info(f'Output audio saved to: {output_path}')
         return output_path
@@ -160,7 +160,7 @@ class VoiceCloner:
         except Exception as e:
             logger.error(f'Voice cloning failed: {e}')
             logger.warning('Falling back to mock mode')
-            return self._mock_clone(text, output_path)
+            return self._mock_clone(output_path)
 
     def _mock_clone(self, output_path):
         '''
@@ -168,8 +168,6 @@ class VoiceCloner:
 
         Parameters
         ----------
-        text : str
-            Text that would be synthesized (unused in mock).
         output_path : str
             Path for output file.
 
