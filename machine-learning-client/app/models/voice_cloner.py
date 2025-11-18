@@ -4,9 +4,9 @@ TTS-based voice cloning model
 
 import os
 import logging
+from datetime import datetime
 import torch
 from TTS.api import TTS
-from datetime import datetime
 from app.config import Config
 
 logger = logging.getLogger(__name__)
@@ -180,9 +180,9 @@ class VoiceCloner:
         '''
         logger.info('Creating mock audio file')
 
+        # Just create an empty file as placeholder
         with open(output_path, 'wb') as f:
-            # Write minimal WAV header for a silent audio file
-            f.write(self._create_silent_wav())
+            f.write(b'')
 
         return output_path
 
