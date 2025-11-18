@@ -1,6 +1,6 @@
-'''
+"""
 Audio processor logic
-'''
+"""
 
 import logging
 from datetime import datetime
@@ -11,19 +11,19 @@ logger = logging.getLogger(__name__)
 
 
 class Processor:
-    '''
+    """
     Service for audio processing operations.
 
     Combines transcription and voice cloning functionality.
-    '''
+    """
 
     def __init__(self):
         self.transcriber = Transcriber()
         self.voice_cloner = VoiceCloner()
-        logger.info('AudioProcessor initialized')
+        logger.info("AudioProcessor initialized")
 
     def transcribe(self, audio_path, language=None):
-        '''
+        """
         Transcribe audio to text.
 
         Parameters
@@ -50,15 +50,15 @@ class Processor:
                 ISO format timestamp of processing
             - audio_path : str
                 Path to the processed audio file
-        '''
-        logger.info(f'Transcribing audio: {audio_path}')
+        """
+        logger.info(f"Transcribing audio: {audio_path}")
         result = self.transcriber.transcribe(audio_path, language)
-        result['timestamp'] = datetime.utcnow().isoformat()
-        result['audio_path'] = audio_path
+        result["timestamp"] = datetime.utcnow().isoformat()
+        result["audio_path"] = audio_path
         return result
 
     def translate_to_english(self, audio_path):
-        '''
+        """
         Translate audio to English.
 
         Parameters
@@ -82,15 +82,15 @@ class Processor:
                 ISO format timestamp of processing
             - audio_path : str
                 Path to the processed audio file
-        '''
-        logger.info(f'Translating audio: {audio_path}')
+        """
+        logger.info(f"Translating audio: {audio_path}")
         result = self.transcriber.translate_to_english(audio_path)
-        result['timestamp'] = datetime.utcnow().isoformat()
-        result['audio_path'] = audio_path
+        result["timestamp"] = datetime.utcnow().isoformat()
+        result["audio_path"] = audio_path
         return result
 
-    def clone_voice(self, reference_audio, text, target_language='en'):
-        '''
+    def clone_voice(self, reference_audio, text, target_language="en"):
+        """
         Clone voice and synthesize speech.
 
         Parameters
@@ -106,15 +106,15 @@ class Processor:
         -------
         output_path : str
             Path to the generated audio file.
-        '''
-        logger.info(f'Cloning voice from: {reference_audio}')
+        """
+        logger.info(f"Cloning voice from: {reference_audio}")
         output_path = self.voice_cloner.clone_and_speak(
             reference_audio, text, target_language
         )
         return output_path
 
     def process_audio_file(self, audio_path):
-        '''
+        """
         Complete workflow: translate and clone voice.
 
         This method performs a complete audio processing pipeline:
@@ -142,34 +142,32 @@ class Processor:
                 Path to the generated cloned voice audio
             - processing_time : float
                 Total processing time in seconds
-        '''
-        logger.info(f'Processing audio file: {audio_path}')
+        """
+        logger.info(f"Processing audio file: {audio_path}")
 
         # Step 1: Translate to English
         translation_result = self.translate_to_english(audio_path)
-        english_text = translation_result['text']
-        source_language = translation_result['source_language']
+        english_text = translation_result["text"]
+        source_language = translation_result["source_language"]
 
         # Step 2: Clone voice
         output_audio_path = self.clone_voice(
-            reference_audio=audio_path,
-            text=english_text,
-            target_language='en'
+            reference_audio=audio_path, text=english_text, target_language="en"
         )
 
         result = {
-            'timestamp': datetime.utcnow().isoformat(),
-            'original_audio_path': audio_path,
-            'source_language': source_language,
-            'english_text': english_text,
-            'output_audio_path': output_audio_path,
-            'processing_time': translation_result.get('processing_time', 0)
+            "timestamp": datetime.utcnow().isoformat(),
+            "original_audio_path": audio_path,
+            "source_language": source_language,
+            "english_text": english_text,
+            "output_audio_path": output_audio_path,
+            "processing_time": translation_result.get("processing_time", 0),
         }
 
         return result
 
     def get_model_info(self):
-        '''
+        """
         Get information about loaded models.
 
         Returns
@@ -180,8 +178,8 @@ class Processor:
                 Information about the transcriber model
             - voice_cloner : dict
                 Information about the voice cloner model
-        '''
+        """
         return {
-            'transcriber': self.transcriber.get_model_info(),
-            'voice_cloner': {'available': self.voice_cloner.is_available()}
+            "transcriber": self.transcriber.get_model_info(),
+            "voice_cloner": {"available": self.voice_cloner.is_available()},
         }

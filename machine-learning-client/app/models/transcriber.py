@@ -1,6 +1,6 @@
-'''
+"""
 Audio transcription model
-'''
+"""
 
 import os
 import time
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class Transcriber:
-    '''
+    """
     Audio transcription using OpenAI Whisper model.
 
     Provides methods for transcribing audio files, translating to English,
@@ -25,10 +25,10 @@ class Transcriber:
         Loaded Whisper model instance.
     model_size : str
         Size of the loaded model (tiny, base, small, medium, large).
-    '''
+    """
 
     def __init__(self, model_size: Optional[str] = None):
-        '''
+        """
         Initialize Whisper transcriber.
 
         Parameters
@@ -36,17 +36,17 @@ class Transcriber:
         model_size : str, optional
             Whisper model size ('tiny', 'base', 'small', 'medium', 'large').
             If None, defaults to value from config.
-        '''
+        """
         if model_size is None:
             model_size = Config.TRANSCRIBER_MODEL_SIZE
 
-        logger.info(f'Loading Whisper model: {model_size}')
+        logger.info(f"Loading Whisper model: {model_size}")
         self.model = whisper.load_model(model_size)
         self.model_size = model_size
-        logger.info(f'Whisper model {model_size} loaded successfully')
+        logger.info(f"Whisper model {model_size} loaded successfully")
 
     def transcribe(self, audio_path: str, language: Optional[str] = None) -> Dict:
-        '''
+        """
         Transcribe an audio file to text.
 
         Parameters
@@ -74,38 +74,38 @@ class Transcriber:
         ------
         FileNotFoundError
             If audio file does not exist.
-        '''
+        """
         if not os.path.exists(audio_path):
-            raise FileNotFoundError(f'Audio file not found: {audio_path}')
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
-        logger.info(f'Transcribing audio file: {audio_path}')
+        logger.info(f"Transcribing audio file: {audio_path}")
         start_time = time.time()
 
         # Transcription options
         options = {
-            'fp16': False,  # Use FP32 for better compatibility
-            'verbose': False,
+            "fp16": False,  # Use FP32 for better compatibility
+            "verbose": False,
         }
 
         if language:
-            options['language'] = language
-            logger.info(f'Using specified language: {language}')
+            options["language"] = language
+            logger.info(f"Using specified language: {language}")
 
         # Perform transcription
         result = self.model.transcribe(audio_path, **options)
 
         processing_time = time.time() - start_time
-        logger.info(f'Transcription completed in {processing_time:.2f} seconds')
+        logger.info(f"Transcription completed in {processing_time:.2f} seconds")
 
         return {
-            'text': result['text'].strip(),
-            'language': result['language'],
-            'segments': result.get('segments', []),
-            'processing_time': processing_time,
+            "text": result["text"].strip(),
+            "language": result["language"],
+            "segments": result.get("segments", []),
+            "processing_time": processing_time,
         }
 
     def translate_to_english(self, audio_path: str) -> Dict:
-        '''
+        """
         Transcribe and translate any language audio to English text.
 
         Uses Whisper's built-in translation capability to convert
@@ -133,35 +133,35 @@ class Transcriber:
         ------
         FileNotFoundError
             If audio file does not exist.
-        '''
+        """
         if not os.path.exists(audio_path):
-            raise FileNotFoundError(f'Audio file not found: {audio_path}')
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
-        logger.info(f'Translating audio to English: {audio_path}')
+        logger.info(f"Translating audio to English: {audio_path}")
         start_time = time.time()
 
         # Translation options - task='translate' converts any language to English
         options = {
-            'task': 'translate',
-            'fp16': False,
-            'verbose': False,
+            "task": "translate",
+            "fp16": False,
+            "verbose": False,
         }
 
         # Perform translation
         result = self.model.transcribe(audio_path, **options)
 
         processing_time = time.time() - start_time
-        logger.info(f'Translation completed in {processing_time:.2f} seconds')
+        logger.info(f"Translation completed in {processing_time:.2f} seconds")
 
         return {
-            'text': result['text'].strip(),
-            'source_language': result['language'],
-            'segments': result.get('segments', []),
-            'processing_time': processing_time,
+            "text": result["text"].strip(),
+            "source_language": result["language"],
+            "segments": result.get("segments", []),
+            "processing_time": processing_time,
         }
 
     def detect_language(self, audio_path: str) -> str:
-        '''
+        """
         Detect the language of an audio file without full transcription.
 
         Uses the first 30 seconds of audio to detect the spoken language.
@@ -182,11 +182,11 @@ class Transcriber:
         ------
         FileNotFoundError
             If audio file does not exist.
-        '''
+        """
         if not os.path.exists(audio_path):
-            raise FileNotFoundError(f'Audio file not found: {audio_path}')
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
-        logger.info(f'Detecting language for: {audio_path}')
+        logger.info(f"Detecting language for: {audio_path}")
 
         # Load audio and pad/trim it to fit 30 seconds
         audio = whisper.load_audio(audio_path)
@@ -199,11 +199,13 @@ class Transcriber:
         _, probs = self.model.detect_language(mel)
         detected_lang = max(probs, key=probs.get)
 
-        logger.info(f'Detected language: {detected_lang} (confidence: {probs[detected_lang]:.2f})')
+        logger.info(
+            f"Detected language: {detected_lang} (confidence: {probs[detected_lang]:.2f})"
+        )
         return detected_lang
 
     def get_model_info(self) -> Dict:
-        '''
+        """
         Get information about the loaded model.
 
         Returns
@@ -216,9 +218,9 @@ class Transcriber:
                 Device being used (cpu or cuda)
             - is_multilingual : bool
                 Whether model supports multiple languages
-        '''
+        """
         return {
-            'model_size': self.model_size,
-            'device': str(self.model.device),
-            'is_multilingual': self.model.is_multilingual,
+            "model_size": self.model_size,
+            "device": str(self.model.device),
+            "is_multilingual": self.model.is_multilingual,
         }
