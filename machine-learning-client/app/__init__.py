@@ -8,6 +8,19 @@ from app.config import Config
 
 
 def create_app(config_class=Config):
+    '''
+    Application factory pattern for Flask app.
+
+    Parameters
+    ----------
+    config_class : class, default=Config
+        Configuration class to use.
+
+    Returns
+    -------
+    app : Flask
+        Configured Flask application instance.
+    '''
     app = Flask(__name__)
     app.config.from_object(config_class)
 
