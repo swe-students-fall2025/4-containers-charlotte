@@ -7,7 +7,7 @@ Build a containerized app that uses machine learning. See [instructions](./instr
 
 ## Project Overview
 
-This project is a **live voice-cloning translator** built as a containerized system. It:
+This project is a **voice-cloning translator** built as a containerized system. It:
 
 1. **Listens to your voice** (uploaded audio).
 2. Uses **Whisper** to perform:
@@ -24,6 +24,31 @@ Everything runs in three Docker containers, orchestrated with `docker-compose`:
 - `web-app` (Flask UI + auth + history)
 - `mongodb` (database)
 
+---
+Prerequisites
+
+Git
+
+Docker & Docker Compose
+(Docker Desktop on macOS/Windows; Docker Engine + Compose on Linux)
+
+Python 3.10+ if you want to run things locally (outside of Docker)
+
+pip or pipenv
+
+Enough disk space to host Whisper + OpenVoice model weights
+
+Model installation (high level):
+
+Install Whisper (e.g. openai-whisper or equivalent).
+
+Install OpenVoice and ensure models/checkpoints are either:
+
+downloaded at container build time, or
+
+mounted as a volume into the ML container.
+
+Exact install details live in machine-learning-client/requirements.txt and Dockerfile.
 ---
 
 ## System Architecture
