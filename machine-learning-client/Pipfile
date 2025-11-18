@@ -6,8 +6,15 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+openai-whisper = "*"
+tts = "*"
+python-dotenv = "*"
+flask = "*"
+pymongo = "*"
 
 [dev-packages]
+pylint = "*"
+black = "*"
 
 [requires]
 python_version = "3.10"
