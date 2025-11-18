@@ -4,7 +4,7 @@ from flask import Blueprint, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
 import models
-from db import db
+from db import get_history_collection
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -19,16 +19,26 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
         if not username or not password:
             flash("Please provide both a username and password", "error")
 
-        user = models.User(db.users.find_one({"username": username}))
-        if user and user.check_password(password):
+        db = get_history_collection().database
+        user_data = db.users.find_one({"username": username})
+
+        if not user_data:
+            flash("Login unsuccessful. Please check username and password.", "danger")
+            return "Login Page"
+
+        user = models.User(user_data)
+
+        if user.check_password(password):
             login_user(user)
             flash("Logged in successfully!", "success")
             return f"User logged in {user.username}"
 
-        flash("Login Unsuccessful. Please check username and password", "danger")
+        flash("Login unsuccessful. Please check username and password.", "danger")
+
     return "Login Page"
 
 
@@ -38,20 +48,28 @@ def register():
 
     if current_user.is_authenticated:
         return "User is already authenticated"
+
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
+        db = get_history_collection().database
         existing_user = db.users.find_one({"username": username})
+
         if existing_user:
             flash("Username already exists. Please choose a different one.", "warning")
+
         else:
             user = models.User({"username": username})
             user.set_password(password)
-            inserted_id = db.users.insert_one(user.to_dict())
-            login_user(models.User(db.users.find_one({"_id": inserted_id.inserted_id})))
-            flash("Logged in successfully!", "success")
-            print("HELLOOO")
-            return f"User logged in {user.username}"
+
+            inserted = db.users.insert_one(user.data)
+            new_user = db.users.find_one({"_id": inserted.inserted_id})
+
+            login_user(models.User(new_user))
+            flash("Registered and logged in successfully!", "success")
+            return f"User logged in {username}"
+
     return "Registration page"
 
 

@@ -1,33 +1,35 @@
-"""Classes used throughout the assignment"""
+"""User and data models"""
 
 from flask_login import UserMixin
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(UserMixin):
-    """Class for users"""
+    """User model wrapper"""
 
     def __init__(self, user_data: dict):
-        self.id: str = str(user_data.get("_id", ""))
-        self.username: str = user_data.get("username", "")
-        self.password_hash: str = user_data.get("password_hash", "")
-        self.history: list = user_data.get("history", [])
+        # Store the original dictionary (important for DB operations)
+        self.data = user_data
+
+        self.id = str(user_data.get("_id", ""))
+        self.username = user_data.get("username", "")
+        self.password_hash = user_data.get("password_hash", "")
+        self.history = user_data.get("history", [])
 
     def to_dict(self) -> dict:
         """Return a dictionary representation of User class without _id"""
-
         return {
             "username": self.username,
             "password_hash": self.password_hash,
             "history": self.history,
         }
 
-    def set_password(self, password: str) -> str:
-        """Set the password for a user"""
-
-        self.password_hash = generate_password_hash(password)
+    def set_password(self, password: str):
+        """Hash password and update both object + underlying dict"""
+        hashed = generate_password_hash(password)
+        self.password_hash = hashed
+        self.data["password_hash"] = hashed
 
     def check_password(self, password: str) -> bool:
-        """Check the password provided against the user's stored password"""
-
+        """Check the password provided against the stored password"""
         return check_password_hash(self.password_hash, password)
