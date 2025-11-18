@@ -4,7 +4,7 @@ from flask import Blueprint, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
 import models
-from db import get_history_collection
+from db import db
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -23,7 +23,6 @@ def login():
         if not username or not password:
             flash("Please provide both a username and password", "error")
 
-        db = get_history_collection().database
         user_data = db.users.find_one({"username": username})
 
         if not user_data:
@@ -53,7 +52,6 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        db = get_history_collection().database
         existing_user = db.users.find_one({"username": username})
 
         if existing_user:

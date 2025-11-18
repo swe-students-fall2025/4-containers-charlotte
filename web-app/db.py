@@ -1,11 +1,14 @@
 """Database operations for the web app"""
 
 import os
+import pathlib
+
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
-def get_history_collection():
-    uri = os.getenv("MONGO_URI", "mongodb://mongodb:27017")
-    db_name = os.getenv("MONGO_DB", "translator")
-    client = MongoClient(uri)
-    db = client[db_name]
-    return db["history"]
+DIR = pathlib.Path(__file__).parent
+
+load_dotenv(DIR / ".env", override=True)
+
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client.get_database(os.getenv("MONGO_DB"))
