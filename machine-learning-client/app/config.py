@@ -34,8 +34,16 @@ class Config:
     DEVICE = os.getenv('DEVICE', 'cpu')  # or 'cuda' for GPU
 
     @staticmethod
-    def init_app(app):
-        '''Initialize application with this config.'''
-        # Create necessary directories
+    def init_directories():
+        '''Create necessary directories for file storage.'''
         os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
         os.makedirs(Config.OUTPUT_FOLDER, exist_ok=True)
+
+    @staticmethod
+    def validate():
+        '''Validate configuration settings.'''
+        required_vars = ['SECRET_KEY', 'MONGO_URI', 'MONGO_DB_NAME']
+        missing = [var for var in required_vars if not os.getenv(var)]
+        if missing:
+            raise ValueError(f'Missing required environment variables: {missing}')
+        return True
