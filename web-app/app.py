@@ -6,8 +6,8 @@ from typing import Optional
 
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, render_template
-from flask_login import LoginManager
+from flask import Flask, redirect, render_template, url_for
+from flask_login import LoginManager, current_user, login_required
 
 import models
 from auth import auth_bp
@@ -18,7 +18,7 @@ DIR = pathlib.Path(__file__).parent
 # Load environment variables
 load_dotenv(DIR / ".env", override=True)
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="./templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 login_manager = LoginManager(app)
@@ -43,7 +43,11 @@ app.register_blueprint(auth_bp)
 @app.route("/")
 def index():
     """Landing page"""
-    return render_template("index.html")
+
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+    else:
+        return redirect(url_for("auth.login"))
 
 
 @app.route("/upload")
@@ -52,16 +56,27 @@ def upload_page():
     return render_template("upload.html")
 
 
-@app.route("/history")
-def history_page():
-    """Render the history page showing past results."""
-    return render_template("history.html")
-
-
 @app.route("/result")
+@login_required
 def result_page():
     """Render the result page which loads data via JS."""
     return render_template("result.html")
+
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    """Dashboard page for a user"""
+
+    return render_template("dashboard.html")
+
+
+@app.route("/history")
+@login_required
+def history():
+    """History of uses by current user"""
+
+    return render_template("history.html")
 
 
 if __name__ == "__main__":

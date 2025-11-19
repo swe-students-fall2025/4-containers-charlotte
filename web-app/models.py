@@ -8,13 +8,19 @@ class User(UserMixin):
     """User model wrapper"""
 
     def __init__(self, user_data: dict):
-        # Store the original dictionary (important for DB operations)
-        self.data = user_data
-
         self.id = str(user_data.get("_id", ""))
         self.username = user_data.get("username", "")
         self.password_hash = user_data.get("password_hash", "")
         self.history = user_data.get("history", [])
+
+    def to_dict(self):
+        """Get dictionary representation of the user"""
+
+        return {
+            "username": self.username,
+            "password_hash": self.password_hash,
+            "history": self.history
+        }
 
     def set_password(self, password: str):
         """Hash password and update both object + underlying dict"""
