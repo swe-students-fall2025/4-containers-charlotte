@@ -48,14 +48,17 @@ def index():
 
 @app.route("/upload")
 def upload_page():
+    """Render the audio upload page."""
     return render_template("upload.html")
 
 @app.route("/history")
 def history_page():
+    """Render the history page showing past results."""
     return render_template("history.html")
 
 @app.route("/result")
 def result_page():
+    """Render the result page which loads data via JS."""
     return render_template("result.html")
 
 
