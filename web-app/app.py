@@ -6,7 +6,7 @@ from typing import Optional
 
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, render_template
 from flask_login import LoginManager
 
 import models
@@ -44,7 +44,19 @@ app.register_blueprint(auth_bp)
 def index():
     """Landing page"""
 
-    return "Web App Running"
+    return render_template("index.html")
+
+@app.route("/upload")
+def upload_page():
+    return render_template("upload.html")
+
+@app.route("/history")
+def history_page():
+    return render_template("history.html")
+
+@app.route("/result")
+def result_page():
+    return render_template("result.html")
 
 
 if __name__ == "__main__":

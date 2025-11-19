@@ -11,4 +11,9 @@ DIR = pathlib.Path(__file__).parent
 load_dotenv(DIR / ".env", override=True)
 
 client = MongoClient(os.getenv("MONGO_URI"))
-db = client.get_database(os.getenv("MONGO_DB"))
+db_name = os.getenv("MONGO_DB")
+if db_name:
+    db = client.get_database(db_name)
+else:
+    print("WARNING: MONGO_DB not set — running UI without DB")
+    db = None
