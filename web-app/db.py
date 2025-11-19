@@ -17,4 +17,3 @@ if db_name:
 else:
     print("WARNING: MONGO_DB not set — running UI without DB")
     db = None
-    
