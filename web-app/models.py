@@ -19,14 +19,13 @@ class User(UserMixin):
         return {
             "username": self.username,
             "password_hash": self.password_hash,
-            "history": self.history
+            "history": self.history,
         }
 
     def set_password(self, password: str):
         """Hash password and update both object + underlying dict"""
         hashed = generate_password_hash(password)
         self.password_hash = hashed
-        self.data["password_hash"] = hashed
 
     def check_password(self, password: str) -> bool:
         """Check the password provided against the stored password"""
