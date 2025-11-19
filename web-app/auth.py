@@ -59,20 +59,20 @@ def register():
         if existing_user:
             flash("Username already exists. Please choose a different one.", "danger")
             return render_template("register.html")
-        else:
-            if password != confirmed_p:
-                flash("Passwords do not match", "danger")
-                return render_template("register.html")
 
-            user = models.User({"username": username})
-            user.set_password(password)
+        if password != confirmed_p:
+            flash("Passwords do not match", "danger")
+            return render_template("register.html")
 
-            inserted = db.users.insert_one(user.data)
-            new_user = db.users.find_one({"_id": inserted.inserted_id})
+        user = models.User({"username": username})
+        user.set_password(password)
 
-            login_user(models.User(new_user))
-            flash("Registered and logged in successfully!", "success")
-            return redirect(url_for("dashboard"))
+        inserted = db.users.insert_one(user.to_dict())
+        new_user = db.users.find_one({"_id": inserted.inserted_id})
+
+        login_user(models.User(new_user))
+        flash("Registered and logged in successfully!", "success")
+        return redirect(url_for("dashboard"))
 
     return render_template("register.html")
 
@@ -81,6 +81,7 @@ def register():
 @login_required
 def logout():
     """Logout current logged in user"""
+
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))

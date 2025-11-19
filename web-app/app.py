@@ -46,8 +46,7 @@ def index():
 
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
-    else:
-        return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login"))
 
 
 @app.route("/upload")
