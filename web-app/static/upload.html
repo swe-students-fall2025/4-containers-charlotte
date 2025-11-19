@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Audio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Upload Audio</h1>
+
+    <form id="uploadForm">
+        <label>Choose audio file:</label>
+        <input type="file" id="fileInput" accept="audio/*" required>
+
+        <label>Target Language:</label>
+        <select id="targetLanguage">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+        </select>
+
+        <button type="submit">Process</button>
+    </form>
+
+    <p id="uploadStatus"></p>
+
+    <script src="app.js"></script>
+</body>
+</html>

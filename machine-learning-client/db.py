@@ -8,3 +8,11 @@ def get_history_collection():
     client = MongoClient(uri)
     db = client[db_name]
     return db["history"]
+
+
+def get_users_collection():
+    uri = os.getenv("MONGO_URI", "mongodb://mongodb:27017")
+    db_name = os.getenv("MONGO_DB", "translator")
+    client = MongoClient(uri)
+    db = client[db_name]
+    return db["users"]
