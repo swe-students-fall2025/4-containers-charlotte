@@ -1,23 +1,9 @@
-<link rel="stylesheet" href="/static/styles.css">
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Result</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/litera/bootstrap.min.css">
-</head>
+{% block content %}
+<h2 class="mb-4">Processing Result</h2>
 
-<body class="p-4">
+<div>{{ result }}</div>
 
-<div class="container mt-5" style="max-width: 700px;">
-    <h2 class="mb-4">Processing Result</h2>
-
-    <div id="result"></div>
-
-    <a href="/history" class="btn btn-secondary mt-4">View History</a>
-</div>
-
-<script src="/static/js/result.js"></script>
-</body>
-</html>
+<a href="/history" class="btn btn-secondary mt-4">View Full History</a>
+{% endblock $}
