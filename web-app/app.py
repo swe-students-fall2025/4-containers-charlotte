@@ -39,20 +39,24 @@ def load_user(user_id: str) -> Optional[models.User]:
 # Register auth blueprint
 app.register_blueprint(auth_bp)
 
+
 @app.route("/")
 def index():
     """Landing page"""
     return render_template("index.html")
+
 
 @app.route("/upload")
 def upload_page():
     """Render the audio upload page."""
     return render_template("upload.html")
 
+
 @app.route("/history")
 def history_page():
     """Render the history page showing past results."""
     return render_template("history.html")
+
 
 @app.route("/result")
 def result_page():
