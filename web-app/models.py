@@ -1,5 +1,6 @@
 """User and data models"""
 
+from bson import ObjectId
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -8,10 +9,10 @@ class User(UserMixin):
     """User model wrapper"""
 
     def __init__(self, user_data: dict):
-        self.id = str(user_data.get("_id", ""))
-        self.username = user_data.get("username", "")
-        self.password_hash = user_data.get("password_hash", "")
-        self.history = user_data.get("history", [])
+        self.id: str = str(user_data.get("_id", ""))
+        self.username: str = user_data.get("username", "")
+        self.password_hash: str = user_data.get("password_hash", "")
+        self.history: list[ObjectId] = user_data.get("history", [])
 
     def to_dict(self):
         """Get dictionary representation of the user"""

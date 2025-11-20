@@ -6,7 +6,7 @@ from typing import Optional
 
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user, login_required
 
 import models
@@ -14,6 +14,7 @@ from auth import auth_bp
 from db import db
 
 DIR = pathlib.Path(__file__).parent
+CLIENT_URL = "127.0.0.1:5001"  # change based on docker config
 
 # Load environment variables
 load_dotenv(DIR / ".env", override=True)
@@ -49,17 +50,29 @@ def index():
     return redirect(url_for("auth.login"))
 
 
-@app.route("/upload")
+@app.route("/upload", methods=["POST", "GET"])
+@login_required
 def upload_page():
     """Render the audio upload page."""
+
+    if request.method == "POST":
+        return "/POST UPLOAD ENDPOINT"
+
     return render_template("upload.html")
 
 
-@app.route("/result")
+@app.route("/result/{result_id}")
 @login_required
-def result_page():
-    """Render the result page which loads data via JS."""
-    return render_template("result.html")
+def result_page(result_id: str):
+    """Render a result page"""
+
+    res = db.history.find_one({"_id": ObjectId(result_id)})
+
+    if not res:
+        flash("Audio translation not found", "danger")
+        return redirect("dashboard")
+
+    return render_template("result.html", result=res)
 
 
 @app.route("/dashboard")
@@ -72,10 +85,15 @@ def dashboard():
 
 @app.route("/history")
 @login_required
-def history():
+def get_history():
     """History of uses by current user"""
 
-    return render_template("history.html")
+    user: dict = db.users.find_one({"_id": ObjectId(current_user.id)})
+    result_history = db.history.find(
+        {"$or": [{"_id": result_id for result_id in user["history"]}]}
+    )
+
+    return render_template("history.html", history=list(result_history))
 
 
 if __name__ == "__main__":

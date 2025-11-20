@@ -1,5 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-DASHBOARD/MAIN PAGE HERE
+<div class="container mt-5" style="max-width: 700px;">
+
+    <h2 class="mb-4">Audio Processing App</h2>
+
+    <p class="lead">
+        Upload audio files, process them using our ML service, and view your past results.
+    </p>
+
+    <div class="card p-4 mt-4">
+        <h4>Get Started</h4>
+        <p>Select an option below to begin:</p>
+
+        <div class="d-grid gap-3 mt-3">
+            <a href="/upload" class="btn btn-primary btn-lg">Upload Audio</a>
+            <a href="/history" class="btn btn-secondary">View History</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
