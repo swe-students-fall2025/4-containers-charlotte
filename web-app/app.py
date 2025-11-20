@@ -39,11 +39,9 @@ def load_user(user_id: str) -> Optional[models.User]:
 # Register auth blueprint
 app.register_blueprint(auth_bp)
 
-
 @app.route("/")
 def index():
     """Landing page"""
-
     return render_template("index.html")
 
 @app.route("/upload")
