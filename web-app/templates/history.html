@@ -5,18 +5,12 @@
 <h2>HISTORY PAGE HERE</h2>
 
 {% if not history %}
-
 <div>No current history</div>
 
 {% else %}
-
 {% for item in history %}
-
 <div>{{ item }}</div>
-
 {% endfor %}
-
 {% endif %}
-
 
 {% endblock %}
