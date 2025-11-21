@@ -107,21 +107,24 @@ def upload_page():
             {"_id": ObjectId(current_user.id)}, {"$push": {"history": inserted_id}}
         )
 
-        return redirect("result/{inserted_id}")
+        return redirect(url_for("result_page", result_id=str(inserted_id)))
 
     return render_template("upload.html")
 
 
-@app.route("/result/{result_id}")
+@app.route("/result/<result_id>")
 @login_required
 def result_page(result_id: str):
     """Render a result page"""
 
-    history_entry = db.history.find_one({"_id": ObjectId(result_id)})
+    history_entry: dict = db.history.find_one({"_id": ObjectId(result_id)})
 
     if not history_entry or ObjectId(current_user.id) != history_entry["owner"]:
         flash("Audio translation not found", "danger")
-        return redirect("dashboard")
+        return redirect(url_for("dashboard"))
+
+    history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
+    history_entry["owner"] = str(history_entry.get("owner"))
 
     return render_template("result.html", result=history_entry)
 
@@ -141,7 +144,7 @@ def get_history():
 
     user: dict = db.users.find_one({"_id": ObjectId(current_user.id)})
     result_history: list[dict] = list(
-        db.history.find({"$or": [{"_id": result_id for result_id in user["history"]}]})
+        db.history.find({"_id": {"$in": user.get("history", [])}})
     )
 
     for history_entry in result_history:
@@ -151,7 +154,7 @@ def get_history():
     return render_template("history.html", history=result_history)
 
 
-@app.route("/audio/{audio_id}")
+@app.route("/audio/<audio_id>")
 @login_required
 def get_audio(audio_id: str):
     """Return the audio file requested"""
