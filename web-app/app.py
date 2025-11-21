@@ -17,11 +17,12 @@ from auth import auth_bp
 from db import db, gridfs
 
 DIR = pathlib.Path(__file__).parent
-CLIENT_URL = "http://127.0.0.1:5001"  # change based on docker config
+CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
 
 # Load environment variables
 load_dotenv(DIR / ".env", override=True)
 
+# Configure app
 app = Flask(__name__, template_folder="./templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
@@ -58,6 +59,7 @@ def index():
 def upload_page():
     """Render the audio upload page."""
 
+    # Upload and send an audio file to ML client
     if request.method == "POST":
         url = f"{CLIENT_URL}/api/process"
         audio_file = request.files["audio"]
@@ -90,6 +92,7 @@ def upload_page():
             )
             return render_template("upload.html")
 
+        # Save operation metadata into history collection
         timestamp = json.get("timestamp")
         history_entry = {
             "owner": ObjectId(current_user.id),
@@ -100,6 +103,7 @@ def upload_page():
             "output_file_id": ObjectId(json.get("output_file_id")),
         }
 
+        # Add operation to history collection, and history of the user
         inserted = db.history.insert_one(history_entry)
         inserted_id = inserted.inserted_id
         db.users.find_one_and_update(
@@ -118,10 +122,12 @@ def result_page(result_id: str):
 
     history_entry: dict = db.history.find_one({"_id": ObjectId(result_id)})
 
+    # Ensure the history entry exists and belongs to the current user
     if not history_entry or ObjectId(current_user.id) != history_entry["owner"]:
         flash("Audio translation not found", "danger")
         return redirect(url_for("dashboard"))
 
+    # Convert Object Id's into strings for easy display
     history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
     history_entry["owner"] = str(history_entry.get("owner"))
 
@@ -141,11 +147,13 @@ def dashboard():
 def get_history():
     """History of uses by current user"""
 
+    # Get list of documents representing operations done by the user
     user: dict = db.users.find_one({"_id": ObjectId(current_user.id)})
     result_history: list[dict] = list(
         db.history.find({"_id": {"$in": user.get("history", [])}})
     )
 
+    # Convert Object Id's into strings for easy display
     for history_entry in result_history:
         history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
         history_entry["owner"] = str(history_entry.get("owner"))
@@ -159,12 +167,14 @@ def get_audio(audio_id: str):
     """Return the audio file requested"""
 
     result_doc = db.history.find_one({"output_file_id": ObjectId(audio_id)})
+
+    # Ensure audio file exists and belongs to the current user
     if not result_doc or result_doc["owner"] != ObjectId(current_user.id):
         return {"error": "Not found"}, 404
 
+    # Send file to frontend
     file = gridfs.open_download_stream(ObjectId(audio_id))
     contents = file.read()
-
     return send_file(
         BytesIO(contents), mimetype="audio/wav", download_name=file.filename
     )
