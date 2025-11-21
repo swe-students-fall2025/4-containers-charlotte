@@ -3,14 +3,15 @@
 import os
 import pathlib
 from datetime import datetime
+from io import BytesIO
 from typing import Optional
 
 import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, send_file, url_for
+from flask import (Flask, flash, redirect, render_template, request, send_file,
+                   url_for)
 from flask_login import LoginManager, current_user, login_required
-from io import BytesIO
 
 import models
 from auth import auth_bp
@@ -140,9 +141,7 @@ def get_history():
 
     user: dict = db.users.find_one({"_id": ObjectId(current_user.id)})
     result_history: list[dict] = list(
-        db.history.find(
-            {"$or": [{"_id": result_id for result_id in user["history"]}]}
-        )
+        db.history.find({"$or": [{"_id": result_id for result_id in user["history"]}]})
     )
 
     for history_entry in result_history:
@@ -165,9 +164,7 @@ def get_audio(audio_id: str):
     contents = file.read()
 
     return send_file(
-        BytesIO(contents),
-        mimetype="audio/wav",
-        download_name=file.filename
+        BytesIO(contents), mimetype="audio/wav", download_name=file.filename
     )
 
 
