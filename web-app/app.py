@@ -2,17 +2,19 @@
 
 import os
 import pathlib
+from datetime import datetime
 from typing import Optional
 
+import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, current_user, login_required
-import requests
+from io import BytesIO
 
 import models
 from auth import auth_bp
-from db import db
+from db import db, gridfs
 
 DIR = pathlib.Path(__file__).parent
 CLIENT_URL = "127.0.0.1:5001"  # change based on docker config
@@ -69,7 +71,7 @@ def upload_page():
         ]:
             flash(
                 "Only the following file formats are accepted: .mp3, .m4a, .wav, .ogg, .flac",
-                "danger"
+                "danger",
             )
             return render_template("upload.html")
 
@@ -77,15 +79,34 @@ def upload_page():
             flash("No selected file", "danger")
             return render_template("upload.html")
 
-        files = {
-            "audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)
-        }
+        files = {"audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)}
 
         res = requests.post(url, files=files)
+        json: dict = res.json()
         if res.status_code != 200:
-            json = res.json()
-            flash(f"{res.status_code} error: {json['error']}", "danger")
+            flash(
+                f"{res.status_code} error: {json.get("error", "Unknown error")}",
+                "danger",
+            )
             return render_template("upload.html")
+
+        timestamp = json.get("timestamp")
+        history_entry = {
+            "owner": ObjectId(current_user.id),
+            "timestamp": datetime.fromisoformat(timestamp) if timestamp else None,
+            "source_language": json.get("source_language"),
+            "english_text": json.get("english_text"),
+            "processing_time": json.get("processing_time"),
+            "output_file_id": ObjectId(json.get("output_file_id")),
+        }
+
+        inserted = db.history.insert_one(history_entry)
+        inserted_id = inserted.inserted_id
+        db.users.find_one_and_update(
+            {"_id": ObjectId(current_user.id)}, {"$push": {"history": inserted_id}}
+        )
+
+        return redirect("result/{inserted_id}")
 
     return render_template("upload.html")
 
@@ -95,13 +116,13 @@ def upload_page():
 def result_page(result_id: str):
     """Render a result page"""
 
-    res = db.history.find_one({"_id": ObjectId(result_id)})
+    history_entry = db.history.find_one({"_id": ObjectId(result_id)})
 
-    if not res:
+    if not history_entry or ObjectId(current_user.id) != history_entry["owner"]:
         flash("Audio translation not found", "danger")
         return redirect("dashboard")
 
-    return render_template("result.html", result=res)
+    return render_template("result.html", result=history_entry)
 
 
 @app.route("/dashboard")
@@ -118,11 +139,36 @@ def get_history():
     """History of uses by current user"""
 
     user: dict = db.users.find_one({"_id": ObjectId(current_user.id)})
-    result_history = db.history.find(
-        {"$or": [{"_id": result_id for result_id in user["history"]}]}
+    result_history: list[dict] = list(
+        db.history.find(
+            {"$or": [{"_id": result_id for result_id in user["history"]}]}
+        )
     )
 
-    return render_template("history.html", history=list(result_history))
+    for history_entry in result_history:
+        history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
+        history_entry["owner"] = str(history_entry.get("owner"))
+
+    return render_template("history.html", history=result_history)
+
+
+@app.route("/audio/{audio_id}")
+@login_required
+def get_audio(audio_id: str):
+    """Return the audio file requested"""
+
+    result_doc = db.history.find_one({"output_file_id": ObjectId(audio_id)})
+    if not result_doc or result_doc["owner"] != ObjectId(current_user.id):
+        return {"error": "Not found"}, 404
+
+    file = gridfs.open_download_stream(ObjectId(audio_id))
+    contents = file.read()
+
+    return send_file(
+        BytesIO(contents),
+        mimetype="audio/wav",
+        download_name=file.filename
+    )
 
 
 if __name__ == "__main__":
