@@ -7,17 +7,7 @@
     <form id="uploadForm" method="POST" action="/upload" enctype="multipart/form-data">
         <div class="mb-3">
             <label class="form-label">Select audio</label>
-            <input type="file" class="form-control" id="fileInput" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Target Language</label>
-            <select id="targetLang" class="form-select">
-                <option value="en" selected>English</option>
-                <option value="fr">French</option>
-                <option value="es">Chinese</option>
-                <option value="zh">Korean</option>
-            </select>
+            <input type="file" class="form-control" id="fileInput" accept=".mp3, .m4a, .wav, .flac, .ogg" required>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Process</button>

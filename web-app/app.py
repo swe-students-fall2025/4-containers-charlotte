@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, current_user, login_required
+import requests
 
 import models
 from auth import auth_bp
@@ -56,7 +57,35 @@ def upload_page():
     """Render the audio upload page."""
 
     if request.method == "POST":
-        return "/POST UPLOAD ENDPOINT"
+        url = f"{CLIENT_URL}/api/process"
+        audio_file = request.files["audio"]
+
+        if audio_file.mimetype not in [
+            "audio/mpeg",
+            "audio/mp4",
+            "audio/wav",
+            "audio/flac",
+            "audio/ogg",
+        ]:
+            flash(
+                "Only the following file formats are accepted: .mp3, .m4a, .wav, .ogg, .flac",
+                "danger"
+            )
+            return render_template("upload.html")
+
+        if audio_file.filename == "":
+            flash("No selected file", "danger")
+            return render_template("upload.html")
+
+        files = {
+            "audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)
+        }
+
+        res = requests.post(url, files=files)
+        if res.status_code != 200:
+            json = res.json()
+            flash(f"{res.status_code} error: {json['error']}", "danger")
+            return render_template("upload.html")
 
     return render_template("upload.html")
 
