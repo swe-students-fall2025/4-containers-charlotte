@@ -4,7 +4,11 @@
 <h2 class="mb-4">Processing Result</h2>
 
 <div>{{ result }}</div>
-<audio src="/audio/{{ result.output_file_id }}"></audio>
+<div>
+    <audio controls>
+        <source src="/audio/{{ result.output_file_id }}" type="audio/wav">
+    </audio>
+</div>
 
 <a href="/history" class="btn btn-secondary mt-4">View Full History</a>
-{% endblock $}
+{% endblock %}

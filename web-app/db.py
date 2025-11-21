@@ -14,9 +14,10 @@ load_dotenv(DIR / ".env", override=True)
 
 client = MongoClient(os.getenv("MONGO_URI"))
 db_name = os.getenv("MONGO_DB")
-if db_name:
-    db: Database = client.get_database(db_name)
-    gridfs = GridFSBucket(db)
-else:
+if not db_name:
     print("WARNING: MONGO_DB not set — running UI without DB")
     db = None
+    gridfs = None
+else:
+    db: Database = client.get_database(db_name)
+    gridfs = GridFSBucket(db, bucket_name="audio")

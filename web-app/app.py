@@ -9,8 +9,7 @@ from typing import Optional
 import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import (Flask, flash, redirect, render_template, request, send_file,
-                   url_for)
+from flask import Flask, flash, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, current_user, login_required
 
 import models
@@ -82,7 +81,7 @@ def upload_page():
 
         files = {"audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)}
 
-        res = requests.post(url, files=files)
+        res = requests.post(url, files=files, timeout=60)
         json: dict = res.json()
         if res.status_code != 200:
             flash(
