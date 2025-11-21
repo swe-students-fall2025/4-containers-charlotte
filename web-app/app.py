@@ -17,7 +17,7 @@ from auth import auth_bp
 from db import db, gridfs
 
 DIR = pathlib.Path(__file__).parent
-CLIENT_URL = "127.0.0.1:5001"  # change based on docker config
+CLIENT_URL = "http://127.0.0.1:5001"  # change based on docker config
 
 # Load environment variables
 load_dotenv(DIR / ".env", override=True)
