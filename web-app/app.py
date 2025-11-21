@@ -2,23 +2,27 @@
 
 import os
 import pathlib
+from datetime import datetime
+from io import BytesIO
 from typing import Optional
 
+import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, current_user, login_required
 
 import models
 from auth import auth_bp
-from db import db
+from db import db, gridfs
 
 DIR = pathlib.Path(__file__).parent
-CLIENT_URL = "127.0.0.1:5001"  # change based on docker config
+CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
 
 # Load environment variables
 load_dotenv(DIR / ".env", override=True)
 
+# Configure app
 app = Flask(__name__, template_folder="./templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
@@ -55,24 +59,79 @@ def index():
 def upload_page():
     """Render the audio upload page."""
 
+    # Upload and send an audio file to ML client
     if request.method == "POST":
-        return "/POST UPLOAD ENDPOINT"
+        url = f"{CLIENT_URL}/api/process"
+        audio_file = request.files["audio"]
+
+        if audio_file.mimetype not in [
+            "audio/mpeg",
+            "audio/mp4",
+            "audio/wav",
+            "audio/flac",
+            "audio/ogg",
+        ]:
+            flash(
+                "Only the following file formats are accepted: .mp3, .m4a, .wav, .ogg, .flac",
+                "danger",
+            )
+            return render_template("upload.html")
+
+        if audio_file.filename == "":
+            flash("No selected file", "danger")
+            return render_template("upload.html")
+
+        files = {"audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)}
+
+        res = requests.post(url, files=files, timeout=60)
+        json: dict = res.json()
+        if res.status_code != 200:
+            flash(
+                f"{res.status_code} error: {json.get("error", "Unknown error")}",
+                "danger",
+            )
+            return render_template("upload.html")
+
+        # Save operation metadata into history collection
+        timestamp = json.get("timestamp")
+        history_entry = {
+            "owner": ObjectId(current_user.id),
+            "timestamp": datetime.fromisoformat(timestamp) if timestamp else None,
+            "source_language": json.get("source_language"),
+            "english_text": json.get("english_text"),
+            "processing_time": json.get("processing_time"),
+            "output_file_id": ObjectId(json.get("output_file_id")),
+        }
+
+        # Add operation to history collection, and history of the user
+        inserted = db.history.insert_one(history_entry)
+        inserted_id = inserted.inserted_id
+        db.users.find_one_and_update(
+            {"_id": ObjectId(current_user.id)}, {"$push": {"history": inserted_id}}
+        )
+
+        return redirect(url_for("result_page", result_id=str(inserted_id)))
 
     return render_template("upload.html")
 
 
-@app.route("/result/{result_id}")
+@app.route("/result/<result_id>")
 @login_required
 def result_page(result_id: str):
     """Render a result page"""
 
-    res = db.history.find_one({"_id": ObjectId(result_id)})
+    history_entry: dict = db.history.find_one({"_id": ObjectId(result_id)})
 
-    if not res:
+    # Ensure the history entry exists and belongs to the current user
+    if not history_entry or ObjectId(current_user.id) != history_entry["owner"]:
         flash("Audio translation not found", "danger")
-        return redirect("dashboard")
+        return redirect(url_for("dashboard"))
 
-    return render_template("result.html", result=res)
+    # Convert Object Id's into strings for easy display
+    history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
+    history_entry["owner"] = str(history_entry.get("owner"))
+
+    return render_template("result.html", result=history_entry)
 
 
 @app.route("/dashboard")
@@ -88,12 +147,37 @@ def dashboard():
 def get_history():
     """History of uses by current user"""
 
+    # Get list of documents representing operations done by the user
     user: dict = db.users.find_one({"_id": ObjectId(current_user.id)})
-    result_history = db.history.find(
-        {"$or": [{"_id": result_id for result_id in user["history"]}]}
+    result_history: list[dict] = list(
+        db.history.find({"_id": {"$in": user.get("history", [])}})
     )
 
-    return render_template("history.html", history=list(result_history))
+    # Convert Object Id's into strings for easy display
+    for history_entry in result_history:
+        history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
+        history_entry["owner"] = str(history_entry.get("owner"))
+
+    return render_template("history.html", history=result_history)
+
+
+@app.route("/audio/<audio_id>")
+@login_required
+def get_audio(audio_id: str):
+    """Return the audio file requested"""
+
+    result_doc = db.history.find_one({"output_file_id": ObjectId(audio_id)})
+
+    # Ensure audio file exists and belongs to the current user
+    if not result_doc or result_doc["owner"] != ObjectId(current_user.id):
+        return {"error": "Not found"}, 404
+
+    # Send file to frontend
+    file = gridfs.open_download_stream(ObjectId(audio_id))
+    contents = file.read()
+    return send_file(
+        BytesIO(contents), mimetype="audio/wav", download_name=file.filename
+    )
 
 
 if __name__ == "__main__":
