@@ -167,8 +167,8 @@ class Processor:
                 metadata={
                     "source_language": source_language,
                     "english_text": english_text,
-                    "timestamp": datetime.utcnow().isoformat()
-                }
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
             )
 
         os.remove(output_audio_path)
