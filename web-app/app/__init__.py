@@ -21,6 +21,7 @@ CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
 
 
 def create_app():
+    '''Create app to export'''
     # Load environment variables
     load_dotenv(DIR / ".env", override=True)
 
