@@ -33,8 +33,12 @@ services:
     environment:
       MONGO_URI: ${MONGO_URI}
       MONGO_DB: ${MONGO_DB}
-      SOURCE_LANG: ${SOURCE_LANG}
-      TARGET_LANG: ${TARGET_LANG}
+      TRANSCRIBER_MODEL_SIZE: ${TRANSCRIBER_MODEL_SIZE:-base}
+      UPLOAD_FOLDER: /app/uploads
+      OUTPUT_FOLDER: /app/outputs
+      DEVICE: ${DEVICE:-cpu}
+    ports:
+      - "5001:5001"
 
 volumes:
   mongo-data:

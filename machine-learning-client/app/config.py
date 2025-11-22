@@ -18,7 +18,7 @@ class Config:
 
     # MongoDB settings
     MONGO_URI = os.getenv("MONGO_URI")
-    MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+    MONGO_DB_NAME = os.getenv("MONGO_DB")
 
     # Transcriber (Whisper) model settings
     TRANSCRIBER_MODEL_SIZE = os.getenv("TRANSCRIBER_MODEL_SIZE", "base")
