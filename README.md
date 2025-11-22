@@ -1,4 +1,6 @@
 [![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml)
+[![Pytest](https://github.com/swe-students-fall2025/4-containers-charlotte/actions/workflows/tests.yml/badge.svg)](https://github.com/swe-students-fall2025/4-containers-charlotte/actions/workflows/tests.yml)
+
 # Containerized App Exercise
 
 Build a containerized app that uses machine learning. See [instructions](./instructions.md) for details.
