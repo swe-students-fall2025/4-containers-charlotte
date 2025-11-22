@@ -1,4 +1,5 @@
 [![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml)
+[![Pytest](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/tests.yml/badge.svg)](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/tests.yml)
 
 # Containerized App Exercise
 

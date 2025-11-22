@@ -164,6 +164,7 @@ def create_app():
 
         # Convert Object Id's into strings for easy display
         for history_entry in result_history:
+            history_entry["_id"] = str(history_entry["_id"])
             history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
             history_entry["owner"] = str(history_entry.get("owner"))
 

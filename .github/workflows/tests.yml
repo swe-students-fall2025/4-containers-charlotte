@@ -1,0 +1,35 @@
+name: Pytest
+
+on: 
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # repeat same job for each subsystem in the following subdirectories
+        include:
+        - subdir: web-app
+          python: "3.13"
+        - subdir: machine-learning-client
+          python: "3.10"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install dependencies
+      run: |
+        cd ${{ matrix.subdir }}
+        python -m pip install --upgrade pip
+        python -m pip install pipenv
+        pipenv sync --dev --python $(which python)
+        pipenv shell --fancy --python $(which python)
+    - name: Run unit tests
+      run: |
+        pytest
