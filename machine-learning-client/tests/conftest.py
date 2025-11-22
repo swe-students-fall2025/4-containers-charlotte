@@ -5,6 +5,17 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask import Flask
 
+# patch ML models and dependencies
+patch_whisper = patch("app.models.transcriber.whisper", MagicMock())
+patch_tts = patch("app.models.voice_cloner.TTS", None)
+patch_config = patch("app.models.voice_cloner.Config.OUTPUT_FOLDER", "/tmp/test_output")
+
+# Start all patches
+patch_whisper.start()
+patch_tts.start()
+patch_config.start()
+
+# pylint: disable=wrong-import-position
 from app.api.routes import api_bp
 from app.models.transcriber import Transcriber
 from app.models.voice_cloner import VoiceCloner
@@ -14,9 +25,8 @@ from app.services.processor import Processor
 @pytest.fixture
 def voice_cloner():
     """Mock voice_cloner model"""
-    with patch("app.models.voice_cloner.TTS", None):
-        with patch("app.models.voice_cloner.Config.OUTPUT_FOLDER", "/tmp/test_output"):
-            yield VoiceCloner()
+    vc = VoiceCloner()
+    return vc
 
 
 @pytest.fixture
