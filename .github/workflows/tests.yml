@@ -32,4 +32,4 @@ jobs:
       - name: Run unit tests
         run: |
           cd ${{ matrix.subdir }}
-          pipenv run pytest
+          PYTHONPATH=. pipenv run pytest
