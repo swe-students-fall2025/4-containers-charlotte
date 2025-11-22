@@ -1,6 +1,10 @@
 """Processor service unit tests"""
 
 from unittest.mock import MagicMock, patch
+import app.services.processor
+
+
+app.services.processor.gridfs = MagicMock()
 
 
 def test_transcribe(mock_ml_client):

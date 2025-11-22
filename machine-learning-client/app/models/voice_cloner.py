@@ -2,11 +2,13 @@
 TTS-based voice cloning model
 """
 
-import os
 import logging
+import os
 from datetime import datetime
+
 import torch
 from TTS.api import TTS
+
 from app.config import Config
 
 logger = logging.getLogger(__name__)

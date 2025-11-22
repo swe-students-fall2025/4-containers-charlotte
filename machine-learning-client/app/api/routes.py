@@ -2,10 +2,12 @@
 API endpoints for ML client processing
 """
 
-import os
 import logging
-from flask import Blueprint, request, jsonify, current_app
+import os
+
+from flask import Blueprint, current_app, jsonify, request
 from werkzeug.utils import secure_filename
+
 from app.services.processor import Processor
 
 api_bp = Blueprint("api", __name__)

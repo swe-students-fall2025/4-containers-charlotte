@@ -1,9 +1,11 @@
 """Voice Cloner model tests"""
 
-from unittest.mock import MagicMock, patch
 import os
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
 import pytest
+
 from app.models.voice_cloner import VoiceCloner
 
 

@@ -16,8 +16,8 @@ from . import models
 from .auth import auth_bp
 from .db import db, gridfs
 
-DIR = pathlib.Path(__file__).parent
-CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
+DIR = pathlib.Path(__file__).parent.parent
+CLIENT_URL = "http://ml:5001"  # ML-client; change based on docker config
 
 
 def create_app():
@@ -26,7 +26,9 @@ def create_app():
     load_dotenv(DIR / ".env", override=True)
 
     # Configure app
-    app = Flask(__name__, template_folder=str(DIR.parent / "templates"))
+    app = Flask(
+        __name__, template_folder=DIR / "templates", static_folder=DIR / "static"
+    )
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
     login_manager = LoginManager(app)
@@ -102,6 +104,7 @@ def create_app():
                 "english_text": json.get("english_text"),
                 "processing_time": json.get("processing_time"),
                 "output_file_id": ObjectId(json.get("output_file_id")),
+                "file_name": audio_file.filename,
             }
 
             # Add operation to history collection, and history of the user
@@ -153,6 +156,7 @@ def create_app():
 
         # Convert Object Id's into strings for easy display
         for history_entry in result_history:
+            history_entry["_id"] = str(history_entry["_id"])
             history_entry["output_file_id"] = str(history_entry.get("output_file_id"))
             history_entry["owner"] = str(history_entry.get("owner"))
 

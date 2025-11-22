@@ -1,6 +1,7 @@
 """Transcriber model unit tests"""
 
 from unittest.mock import MagicMock, patch
+
 import pytest
 
 

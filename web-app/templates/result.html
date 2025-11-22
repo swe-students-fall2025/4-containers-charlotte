@@ -1,14 +1,56 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="mb-4">Processing Result</h2>
+<div class="container my-5 d-flex flex-column align-items-center">
+    <h2 class="mb-4 text-center">Processed Result</h2>
 
-<div>{{ result }}</div>
-<div>
-    <audio controls>
-        <source src="/audio/{{ result.output_file_id }}" type="audio/wav">
-    </audio>
+    <div class="d-flex justify-content-center mb-4 col-md-6">
+        <audio controls class="w-100">
+            <source src="/audio/{{ result.output_file_id }}" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <div class="row justify-content-center w-100">
+
+        <div class="col-md-7 mb-1 mt-3 me-1">
+            <div class="shadow card bg-secondary rounded-5 h-100">
+                <div class="card-header bg-primary rounded-top-5 py-3 d-flex justify-content-center">
+                    <strong>Transcription</strong>
+                </div>
+                <div class="bg-secondary rounded-bottom-5 py-3 px-3">
+                    {{ result.english_text }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-1 mt-3 ms-1">
+            <div class="shadow card bg-secondary rounded-5 h-100">
+                <div class="card-header bg-primary rounded-top-5 py-3 d-flex justify-content-center fs-5">
+                    <strong>File Details</strong>
+                </div>
+                <ul class="list-group list-group-flush rounded-top-0 rounded-bottom-5">
+                    <li class="list-group-item bg-secondary py-3">
+                        <strong>File Name:</strong><span class="px-1"></span>{{ result.file_name }}
+                    </li>
+                    <li class="list-group-item bg-secondary py-3">
+                        <strong>Source Language:</strong><span class="px-1"></span>{{ result.source_language }}
+                    </li>
+                    <li class="list-group-item bg-secondary py-3">
+                        <strong>Timestamp:</strong><span class="px-1"></span>
+                        {{ result.timestamp.strftime('%Y-%m-%d %H:%M:%S %Z') }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+
 </div>
 
-<a href="/history" class="btn btn-secondary mt-4">View Full History</a>
+
+<div class="text-center">
+    <a href="/history" class="shadow btn btn-secondary w-25 btn-lg">View Full History</a>
+</div>
 {% endblock %}
