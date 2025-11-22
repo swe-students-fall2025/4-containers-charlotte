@@ -2,6 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 import pytest
+from datetime import datetime
 from bson import ObjectId
 from app import create_app
 
@@ -57,7 +58,7 @@ def mock_db():
             return_value={
                 "_id": ObjectId(),
                 "owner": ObjectId(),
-                "timestamp": "2025-01-01T12:00:00",
+                "timestamp": datetime.fromisoformat("2025-01-01T12:00:00"),
                 "source_language": "fr",
                 "english_text": "Hello",
                 "processing_time": 1.23,
