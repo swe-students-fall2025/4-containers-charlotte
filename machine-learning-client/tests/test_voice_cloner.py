@@ -29,20 +29,18 @@ def test_clone_and_speak_nonexistent_file_raises(voice_cloner):
             voice_cloner.clone_and_speak("nonexistent.wav", "Hello")
 
 
-@patch("app.models.voice_cloner.TTS")
-@patch("torch.cuda.is_available")
-def test_init_model_sets_device_and_model(mock_cuda, mock_tts_class):
+def test_init_model_sets_device_and_model():
     """Init model test setting device and model type"""
-    mock_tts_instance = MagicMock()
-    mock_tts_class.return_value = mock_tts_instance
+    with patch("app.models.voice_cloner.torch.cuda.is_available", return_value=False):
+        with patch("app.models.voice_cloner.TTS") as mock_tts_class:
+            mock_tts_instance = MagicMock()
+            mock_tts_class.return_value = mock_tts_instance
 
-    mock_cuda.return_value = False
+            vc = VoiceCloner()
 
-    vc = VoiceCloner()
-
-    assert vc.device == "cpu"
-    assert vc.tts_model == mock_tts_instance.to.return_value
-    mock_tts_instance.to.assert_called_once_with("cpu")
+            assert vc.device == "cpu"
+            assert vc.tts_model == mock_tts_instance.to.return_value
+            mock_tts_instance.to.assert_called_once_with("cpu")
 
 
 def test_clone_and_speak_calls_tts(monkeypatch):

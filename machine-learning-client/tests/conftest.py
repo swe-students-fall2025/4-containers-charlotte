@@ -7,11 +7,13 @@ from flask import Flask
 
 # patch ML models and dependencies
 patch_whisper = patch("app.models.transcriber.whisper", MagicMock())
+patch_torch = patch("app.models.voice_cloner.torch", MagicMock(return_value="cpu"))
 patch_tts = patch("app.models.voice_cloner.TTS", None)
 patch_config = patch("app.models.voice_cloner.Config.OUTPUT_FOLDER", "/tmp/test_output")
 
 # Start all patches
 patch_whisper.start()
+patch_torch.start()
 patch_tts.start()
 patch_config.start()
 
