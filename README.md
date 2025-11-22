@@ -1,123 +1,234 @@
-[![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml)
-[![Pytest](https://github.com/swe-students-fall2025/4-containers-charlotte/actions/workflows/tests.yml/badge.svg)](https://github.com/swe-students-fall2025/4-containers-charlotte/actions/workflows/tests.yml)
-
 # Containerized App Exercise
 
 Build a containerized app that uses machine learning. See [instructions](./instructions.md) for details.
 
+[![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml)
+[![Pytest](https://github.com/swe-students-fall2025/4-containers-charlotte/actions/workflows/tests.yml/badge.svg)](https://github.com/swe-students-fall2025/4-containers-charlotte/actions/workflows/tests.yml)
 
-## Project Overview
+## Echo - Translation with Voice Cloning
 
-This project is a **voice-cloning translator** built as a containerized system. It:
+> Translate your voice into English while preserving your unique vocal characteristics using AI-powered speech recognition and voice cloning.
 
-1. **Listens to your voice** (uploaded audio).
-2. Uses **Whisper** to perform:
-   - **Speech recognition** (transcription).
-   - **Speech translation** into English (or other target languages).
-3. Uses **OpenVoice** to:
-   - **Clone your voice** from a reference clip.
-   - **Generate translated speech** in your cloned voice.
-4. Stores user accounts & translation history in **MongoDB**, and exposes all of this via a **Flask web app** dashboard.
+## Team Members
 
-Everything runs in three Docker containers, orchestrated with `docker-compose`:
-
-- `machine-learning-client` (Whisper + OpenVoice API)
-- `web-app` (Flask UI + auth + history)
-- `mongodb` (database)
+- [Hyunkyu Park](https://github.com/hyunkyuu)
+- [Samuel Yang](https://github.com/SamuelYang24)
+- [Chengqi Li](https://github.com/lichengqi617)
+- [Matthew Zhou](https://github.com/mzhou3299)
+- [Nicole Zhang](https://github.com/chzzznn)
 
 ---
-## Prerequisites
 
-Before running the system, ensure the following tools and resources are installed on your machine:
+## Table of Contents
 
-### Required Software
-- **Git** — for version control and cloning the repository.
-- **Docker & Docker Compose**
-  - Docker Desktop (macOS/Windows), or
-  - Docker Engine + Docker Compose plugin (Linux)
-- **Python 3.10+** (optional, only needed for local development outside of Docker)
-- **pip** or **pipenv** — for managing Python packages during local testing.
+- [About the Project](#about-the-project)
+- [System Architecture](#system-architecture)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+  - [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [Development](#development)
 
-### Hardware & Storage Requirements
-- Enough disk space to store:
-  - Whisper model weights (from 150 MB to 3 GB depending on model size)
-  - OpenVoice checkpoints (typically 500 MB – 1.5 GB)
-  - Processed audio outputs (user-generated)
+---
 
-### Machine Learning Model Dependencies
+## About the Project
 
-The machine learning client requires several ML libraries (installed automatically inside the Docker container):
+**Echo** is a containerized voice translation system. The application takes audio input in any language, translates it to English, and generates the translated speech in the user's original voice using voice cloning technology.
 
+### What It Does
 
-During Docker image build, these packages are installed based on  
-**machine-learning-client/requirements.txt**.
-
-### Model Installation Notes
-
-The ML container must have access to the pretrained model files:
-
-1. **Whisper model**
-   - Automatically downloaded at runtime on first use, *OR*
-   - Pre-downloaded and mounted into the container for faster inference.
-
-2. **OpenVoice model**
-   - Checkpoint and config files must be:
-     - downloaded during image build, *or*
-     - stored in a `/models` directory and mounted as a volume:
-       ```yaml
-       volumes:
-         - ml-models:/models
-       ```
-
-Your actual model locations are configured through environment variables (see next section).
-
+1. **Upload Audio** - Users upload audio files through a web interface
+2. **Speech Recognition** - Whisper AI transcribes and detects the source language
+3. **Translation** - Automatic translation to English text
+4. **Voice Cloning** - TTS (Text-to-Speech) generates English speech in the user's voice
+5. **History Tracking** - All translations are stored with user authentication
 
 ---
 
 ## System Architecture
 
-**Subsystems**
+The application consists of three independent containerized services:
 
-1. **Machine Learning Client (ML API) – container 1**
-   - Flask service exposing ML endpoints:
-     - `/transcribe` – Whisper transcription.
-     - `/translate` – Whisper translation to English.
-     - `/voice-clone` – OpenVoice voice cloning + TTS.
-     - `/download/<filename>` – download generated audio.
-     - `/process` – end-to-end pipeline (translate + clone).
-   - Handles:
-     - File upload & validation (`ALLOWED_EXTENSIONS`, `UPLOAD_FOLDER`).
-     - Pretrained model loading (Whisper + OpenVoice).
-     - Audio processing & saving outputs to `OUTPUT_FOLDER`.
-   - Optionally writes metadata to MongoDB (e.g., job records, audio paths).
-
-2. **Web App – container 2**
-   - Flask app (`app.py`) with:
-     - `flask-login` for user authentication.
-     - `User` model (`models.py`) with password hashing.
-     - `auth` blueprint for registration/login/logout.
-     - History stored in MongoDB (via `get_history_collection()`).
-   - Responsibilities:
-     - Serve the main UI (forms/pages).
-     - Accept audio uploads and/or text input from users.
-     - Call the ML client’s API endpoints to:
-       - Transcribe/translate user audio.
-       - Trigger voice cloning & TTS.
-     - Store each user’s translation/voice-cloning history in MongoDB.
-     - Render a dashboard of past translations and links to generated audio.
-
-3. **Database – container 3**
-   - MongoDB instance (official `mongo` image).
-   - Stores:
-     - `users` collection: username, hashed password, user metadata.
-     - `history` (or similar) collection: per-user translation / voice-clone records.
-   - The ML client and web app **share** this database.
-
-**Communication**
-
-- **Web app → MongoDB:** via `pymongo` in `db.py` / `get_history_collection`.
-- **ML client → web app:** not needed directly.
-- **Web app → ML client:** HTTP requests to ML API (internal Docker network).
-- **ML client ↔ MongoDB (optional but recommended):** can log each processed job.
+```text
+┌─────────────────┐      ┌──────────────────┐      ┌─────────────┐
+│   Web App       │─────▶│  ML Client       │      │  MongoDB    │
+│  (Flask)        │      │  (Flask API)     │      │             │
+│  Port: 5000     │      │  Port: 5001      │      │ Port: 27017 │
+│                 │      │                  │      │             │
+│ - User Auth     │      │ - Whisper AI     │      │ - Users     │
+│ - Upload UI     │      │ - TTS Cloning    │      │ - History   │
+│ - History View  │      │ - Audio Process  │      │ - GridFS    │
+└─────────────────┘      └──────────────────┘      └─────────────┘
+        │                         │                        │
+        └─────────────────────────┴────────────────────────┘
+```
 
 ---
+
+## Getting Started
+
+### Prerequisites
+
+Before running this application, ensure you have the following installed
+
+- **Docker Desktop** (macOS/Windows) or **Docker Engine + Docker Compose** (Linux)
+- **Git** - for cloning the repository
+- **Python** - for cloning the repository
+
+### Installation
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/swe-students-fall2025/4-containers-charlotte.git
+cd 4-containers-charlotte
+```
+
+#### 2. Set up environment variables
+
+```bash
+cp .env.example .env
+```
+
+#### 3. Review and customize the `.env` file
+
+```bash
+nano .env  # or use your preferred editor
+```
+
+---
+
+## Environment Variables
+
+The application uses the following environment variables (defined in `.env`):
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `SECRET_KEY` | Flask secret key for sessions | - | Yes |
+| `MONGO_URI` | MongoDB connection string | `mongodb://mongodb:27017` | Yes |
+| `MONGO_DB` | Database name | `db_name` | Yes |
+| `TRANSCRIBER_MODEL_SIZE` | Whisper model size (tiny/base/small/medium/large) | `base` | No |
+| `DEVICE` | ML processing device (cpu/cuda) | `cpu` | No |
+| `CLIENT_URL` | ML client URL for web app | `http://ml:5001` | No |
+
+---
+
+## Running the Application
+
+### Start all containers
+
+```bash
+docker-compose up --build
+```
+
+This will:
+
+- Build the web app and ML client Docker images
+- Download the MongoDB image
+- Start all three containers
+- Download ML models on first run (may take several minutes)
+
+### Access the application
+
+- **Web Interface**: [http://localhost:5000](http://localhost:5000)
+- **ML API**: [http://localhost:5000](http://localhost:5001/api)
+- **MongoDB**: localhost:27017
+
+### Stop the application
+
+```bash
+docker-compose down
+```
+
+To stop and remove all data (including database):
+
+```bash
+docker-compose down -v
+```
+
+---
+
+## Project Structure
+
+```text
+.
+├── .github/
+│   └── workflows/
+│       ├── lint.yml          # Linting workflow
+│       └── tests.yml         # Testing workflow
+├── machine-learning-client/
+│   ├── app/
+│   │   ├── __init__.py       # Flask app factory
+│   │   ├── config.py         # Configuration
+│   │   ├── db.py             # Database connection
+│   │   ├── api/
+│   │   │   └── routes.py     # API endpoints
+│   │   ├── models/
+│   │   │   ├── transcriber.py    # Whisper
+│   │   │   └── voice_cloner.py   # TTS
+│   │   └── services/
+│   │       └── processor.py  # Processing logic
+│   ├── tests/                # Unit tests
+│   ├── Dockerfile
+│   └── Pipfile
+├── web-app/
+│   ├── templates/           # HTML templates
+│   ├── tests/               # Unit tests
+│   ├── app.py               # Flask app
+│   ├── auth.py              # Authentication
+│   ├── models.py            # User model
+│   ├── db.py                # Database
+│   ├── Dockerfile
+│   └── Pipfile
+├── docker-compose.yml       # Container orchestration
+├── .env.example             # Environment template
+└── README.md                # This file
+```
+
+---
+
+## Development
+
+### Running Tests
+
+**Machine Learning Client:**
+
+```bash
+cd machine-learning-client
+pipenv install --dev
+pipenv run pytest tests/
+```
+
+**Web App:**
+
+```bash
+cd web-app
+pipenv install --dev
+pipenv run pytest tests/
+```
+
+### View Logs
+
+View logs for specific containers:
+
+```bash
+# All containers
+docker-compose logs
+
+# Specific container
+docker-compose logs web
+docker-compose logs ml
+docker-compose logs mongodb
+
+# Follow logs in real-time
+docker-compose logs -f
+```
+
+---
+
+## Acknowledgments
+
+- **OpenAI Whisper** - Speech recognition model
+- **Coqui TTS** - Voice cloning technology
