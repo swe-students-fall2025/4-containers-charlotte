@@ -1,9 +1,4 @@
-from unittest.mock import patch, MagicMock
-from flask_login import current_user
-import pytest
-from app.models import User
-from bson import ObjectId
-
+"""Tests login"""
 
 def test_login_get(client):
     """Test GET /login returns 200."""
@@ -13,6 +8,7 @@ def test_login_get(client):
 
 
 def test_login_post_successful(client, mock_db, mock_user):
+    """Test POST /login returns 302 and redirects to dashboard"""
     mock_db.users.find_one.return_value = {"username": "test", "password": "hashed"}
     mock_user.return_value.check_password.return_value = True
 

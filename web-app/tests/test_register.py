@@ -1,5 +1,5 @@
-import pytest
-from unittest.mock import patch, MagicMock
+"""Tests register"""
+from unittest.mock import MagicMock
 
 
 def test_register_get(client):
@@ -16,6 +16,9 @@ def test_register_post_success(client, mock_db, mock_user):
     mock_insert.inserted_id = "fake_id"
     mock_db.users.insert_one.return_value = mock_insert
 
+    mock_user_instance = mock_user.return_value
+    mock_user_instance.to_dict.return_value = {"username" : "test"}
+
     response = client.post(
         "/register",
         data={
@@ -30,7 +33,7 @@ def test_register_post_success(client, mock_db, mock_user):
     assert "/dashboard" in response.headers["Location"]
 
 
-def test_register_post_existing_username(client, mock_db, mock_user):
+def test_register_post_existing_username(client, mock_db):
     """Test POST /register fails when username exists."""
     mock_db.users.find_one.return_value = {"username": "test"}
 
@@ -48,7 +51,7 @@ def test_register_post_existing_username(client, mock_db, mock_user):
     assert b"Username already exists" in response.data
 
 
-def test_register_post_password_mismatch(client, mock_db, mock_user):
+def test_register_post_password_mismatch(client, mock_db):
     """Test POST /register fails when passwords do not match."""
     mock_db.users.find_one.return_value = None
 
