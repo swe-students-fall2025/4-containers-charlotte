@@ -11,11 +11,11 @@ Translate your voice into English while preserving your unique vocal characteris
 
 ## Team Members
 
-- Hyunkyu Park [https://github.com/hyunkyuu]
-- Samuel Yang [https://github.com/SamuelYang24]
-- Chengqi Li [https://github.com/lichengqi617]
-- Matthew Zhou [https://github.com/mzhou3299]
-- Nicole Zhang [https://github.com/chzzznn]
+- Hyunkyu Park [github.com/hyunkyuu](https://github.com/hyunkyuu)
+- Samuel Yang [github.com/SamuelYang24](https://github.com/SamuelYang24)
+- Chengqi Li [github.com/lichengqi617](https://github.com/lichengqi617)
+- Matthew Zhou [github.com/mzhou3299](https://github.com/mzhou3299)
+- Nicole Zhang [github.com/chzzznn](https://github.com/chzzznn)
 
 ## Table of Contents
 
@@ -121,8 +121,8 @@ This will
 
 ### Access the application
 
-- **Web Interface**: [http://localhost:5000]
-- **ML API**: [http://localhost:5000]
+- **Web Interface**: [http://localhost:5000](http://localhost:5000)
+- **ML API**: [http://localhost:5001](http://localhost:5001)
 - **MongoDB**: localhost:27017
 
 ### Stop the application
