@@ -25,7 +25,7 @@ from .auth import auth_bp
 from .db import db, gridfs
 
 DIR = pathlib.Path(__file__).parent.parent
-CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
+CLIENT_URL = "http://ml:5001"  # ML-client; change based on docker config
 
 
 def create_app():

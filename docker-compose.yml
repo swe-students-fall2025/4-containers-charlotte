@@ -38,3 +38,6 @@ services:
       DEVICE: ${DEVICE:-cpu}
     ports:
       - "5001:5001"
+
+volumes:
+  mongo-data:
