@@ -1,21 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 700px;">
+<div class="container mt-5 col-md-8 d-flex justify-content-center">
 
-    <h2 class="mb-4">Audio Processing App</h2>
+    <div class="rounded-five w-100 border border-dark border-5 py-5 px-5 rounded-5">
+        <h2 class="mb-4">Audio Processing App</h2>
 
-    <p class="lead">
-        Upload audio files, process them using our ML service, and view your past results.
-    </p>
+        <p class="lead">
+            Upload audio files, translate them to English using our ML service, and view past results.
+        </p>
 
-    <div class="card p-4 mt-4">
-        <h4>Get Started</h4>
-        <p>Select an option below to begin:</p>
+        <div class="shadow card p-4 mt-4 pb-4 rounded-5 ">
+            <h3 class="mb-3">Get Started</h3>
+            <h4 class="text-white-50">Select an option below to begin:</h4>
 
-        <div class="d-grid gap-3 mt-3">
-            <a href="/upload" class="btn btn-primary btn-lg">Upload Audio</a>
-            <a href="/history" class="btn btn-secondary">View History</a>
+            <div class="d-grid gap-3 mt-3">
+                <a href="/upload" class="shadow btn btn-primary btn-lg fs-4">Upload Audio</a>
+                <a href="/history" class="shadow btn btn-secondary mb-2 fs-5">View History</a>
+            </div>
         </div>
     </div>
 </div>
