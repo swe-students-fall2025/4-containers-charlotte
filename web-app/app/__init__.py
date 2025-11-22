@@ -21,7 +21,7 @@ CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
 
 
 def create_app():
-    '''Create app to export'''
+    """Create app to export"""
     # Load environment variables
     load_dotenv(DIR / ".env", override=True)
 
@@ -30,7 +30,6 @@ def create_app():
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
     login_manager = LoginManager(app)
-
 
     @login_manager.user_loader
     def load_user(user_id: str) -> Optional[models.User]:
@@ -43,10 +42,8 @@ def create_app():
 
         return models.User(user_data)
 
-
     # Register auth blueprint
     app.register_blueprint(auth_bp)
-
 
     @app.route("/")
     def index():
@@ -55,7 +52,6 @@ def create_app():
         if current_user.is_authenticated:
             return redirect(url_for("dashboard"))
         return redirect(url_for("auth.login"))
-
 
     @app.route("/upload", methods=["POST", "GET"])
     @login_required
@@ -84,7 +80,9 @@ def create_app():
                 flash("No selected file", "danger")
                 return render_template("upload.html")
 
-            files = {"audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)}
+            files = {
+                "audio": (audio_file.filename, audio_file.stream, audio_file.mimetype)
+            }
 
             res = requests.post(url, files=files, timeout=60)
             json: dict = res.json()
@@ -117,7 +115,6 @@ def create_app():
 
         return render_template("upload.html")
 
-
     @app.route("/result/<result_id>")
     @login_required
     def result_page(result_id: str):
@@ -136,14 +133,12 @@ def create_app():
 
         return render_template("result.html", result=history_entry)
 
-
     @app.route("/dashboard")
     @login_required
     def dashboard():
         """Dashboard page for a user"""
 
         return render_template("dashboard.html")
-
 
     @app.route("/history")
     @login_required
@@ -162,7 +157,6 @@ def create_app():
             history_entry["owner"] = str(history_entry.get("owner"))
 
         return render_template("history.html", history=result_history)
-
 
     @app.route("/audio/<audio_id>")
     @login_required

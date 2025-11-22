@@ -1,4 +1,4 @@
-'''Main to run the app'''
+"""Main to run the app"""
 from app import create_app
 
 app = create_app()
