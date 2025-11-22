@@ -180,6 +180,5 @@ def create_app():
         return send_file(
             BytesIO(contents), mimetype="audio/wav", download_name=file.filename
         )
-    
-    return app
 
+    return app
