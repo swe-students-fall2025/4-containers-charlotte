@@ -2,15 +2,67 @@
 
 {% block content %}
 
-<h1 class="mb-4">USAGE HISTORY</h1>
+<h1 class="mb-4 ps-3">USAGE HISTORY</h1>
 
 {% if not history %}
-<h4 class="text-muted">No past translations found...</h4>
+<h4 class="text-muted ps-3">No past translations found...</h4>
 
 {% else %}
-{% for item in history %}
-<div>{{ item }}</div>
-{% endfor %}
+<div class="container">
+    <div class="row">
+        {% for item in history %}
+        <div class="col-md-4 mb-4">
+            <div class="card rounded-4 shadow">
+                <div class="card-header rounded-top-4 bg-primary d-flex justify-content-center">
+                    {{ item.file_name }}
+                </div>
+                <div class="card-body text-dark bg-light rounded-bottom-4 p-3">
+                    <div class="row py-1">
+                        <div class="col-5 fw-semibold text-end pe-3 border-end border-dark">
+                            Timestamp:
+                        </div>
+                        <div class="col-7">
+                            {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S %Z') }}
+                        </div>
+                    </div>
+
+                    <div class="row py-1">
+                        <div class="col-5 fw-semibold text-end pe-3 border-end border-dark">
+                            Translated from:
+                        </div>
+                        <div class="col-7">
+                            {{ item.source_language }}
+                        </div>
+                    </div>
+
+                    <div class="row py-1">
+                        <div class="col-5 fw-semibold text-end pe-3 border-end border-dark">
+                            Translated text:
+                        </div>
+                        <div class="col-7">
+                            {{ item.english_text }}
+                        </div>
+                    </div>
+
+                    <div class="row py-1">
+                        <div class="col-5 fw-semibold text-end pe-3 border-end border-dark">
+                            Processing time:
+                        </div>
+                        <div class="col-7">
+                            {{ item.processing_time }} sec
+                        </div>
+                    </div>
+
+                    <div class="row py-1 d-flex justify-content-center">
+                        <a class="shadow btn btn-primary w-75 mt-4 mb-2 fs-5">Go to translation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
 {% endif %}
 
 {% endblock %}

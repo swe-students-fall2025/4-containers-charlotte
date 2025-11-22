@@ -9,15 +9,15 @@ from typing import Optional
 import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, flash, redirect, render_template, request, send_file, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, current_user, login_required
 
 from . import models
 from .auth import auth_bp
 from .db import db, gridfs
 
-DIR = pathlib.Path(__file__).parent
-CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
+DIR = pathlib.Path(__file__).parent.parent
+CLIENT_URL = "http://127.0.0.1:5000"  # ML-client; change based on docker config
 
 
 def create_app():
@@ -26,7 +26,7 @@ def create_app():
     load_dotenv(DIR / ".env", override=True)
 
     # Configure app
-    app = Flask(__name__, template_folder=str(DIR.parent / "templates"))
+    app = Flask(__name__, template_folder=DIR / "templates", static_folder=DIR / "static")
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
     login_manager = LoginManager(app)
@@ -102,6 +102,7 @@ def create_app():
                 "english_text": json.get("english_text"),
                 "processing_time": json.get("processing_time"),
                 "output_file_id": ObjectId(json.get("output_file_id")),
+                "file_name": audio_file.filename
             }
 
             # Add operation to history collection, and history of the user
@@ -139,6 +140,28 @@ def create_app():
         """Dashboard page for a user"""
 
         return render_template("dashboard.html")
+
+    @app.route("/api/process", methods=["POST"])
+    def fake_ml_process():
+        """Dummy ml-client emulator endpoint"""
+
+        if "audio" not in request.files:
+            return jsonify({"error": "No audio file uploaded"}), 400
+
+        audio_file = request.files["audio"]
+
+        file_stream = audio_file.stream
+        file_id = gridfs.upload_from_stream(audio_file.filename, file_stream)
+
+        response = {
+            "timestamp": datetime.now().isoformat(),
+            "source_language": "kr",
+            "english_text": "Hello world",
+            "processing_time": 1.23,
+            "output_file_id": str(file_id),
+        }
+
+        return jsonify(response), 200
 
     @app.route("/history")
     @login_required
