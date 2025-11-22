@@ -8,9 +8,12 @@ def test_login_get(client):
     assert b"Login" in response.data
 
 
-def test_login_post_successful(client, mock_db, mock_user):
+def test_login_post_successful(client, mock_db_auth, mock_user):
     """Test POST /login returns 302 and redirects to dashboard"""
-    mock_db.users.find_one.return_value = {"username": "test", "password": "hashed"}
+    mock_db_auth.users.find_one.return_value = {
+        "username": "test",
+        "password": "hashed",
+    }
     mock_user.return_value.check_password.return_value = True
 
     response = client.post(
@@ -23,10 +26,10 @@ def test_login_post_successful(client, mock_db, mock_user):
     assert "/dashboard" in response.headers["Location"]
 
 
-def test_login_post_failure(client, mock_db, mock_user):
+def test_login_post_failure(client, mock_db_auth, mock_user):
     """Test POST /login with invalid credentials flashes error."""
     # Mock DB to return a user object (so we reach password check)
-    mock_db.users.find_one.return_value = {
+    mock_db_auth.users.find_one.return_value = {
         "_id": "1234",
         "username": "test",
         "password_hash": "hashed",
