@@ -2,8 +2,10 @@
 Audio processor logic
 """
 
+import os
 import logging
 from datetime import datetime
+from app.db import gridfs
 from app.models.transcriber import Transcriber
 from app.models.voice_cloner import VoiceCloner
 
@@ -120,6 +122,7 @@ class Processor:
         This method performs a complete audio processing pipeline:
         1. Translates the audio to English text
         2. Clones the original voice with the translated text
+        3. Uploads the output audio to GridFS
 
         Parameters
         ----------
@@ -138,8 +141,8 @@ class Processor:
                 Detected source language
             - english_text : str
                 Translated English text
-            - output_audio_path : str
-                Path to the generated cloned voice audio
+            - output_file_id : str
+                ObjectId of the generated audio file in GridFS
             - processing_time : float
                 Total processing time in seconds
         """
@@ -155,31 +158,28 @@ class Processor:
             reference_audio=audio_path, text=english_text, target_language="en"
         )
 
+        # Step 3: Upload output audio to GridFS
+        output_filename = os.path.basename(output_audio_path)
+        with open(output_audio_path, "rb") as audio_file:
+            file_id = gridfs.upload_from_stream(
+                output_filename,
+                audio_file,
+                metadata={
+                    "source_language": source_language,
+                    "english_text": english_text,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+
+        os.remove(output_audio_path)
+
         result = {
             "timestamp": datetime.utcnow().isoformat(),
             "original_audio_path": audio_path,
             "source_language": source_language,
             "english_text": english_text,
-            "output_audio_path": output_audio_path,
+            "output_file_id": str(file_id),
             "processing_time": translation_result.get("processing_time", 0),
         }
 
         return result
-
-    def get_model_info(self):
-        """
-        Get information about loaded models.
-
-        Returns
-        -------
-        info : dict
-            Dictionary with model information containing:
-            - transcriber : dict
-                Information about the transcriber model
-            - voice_cloner : dict
-                Information about the voice cloner model
-        """
-        return {
-            "transcriber": self.transcriber.get_model_info(),
-            "voice_cloner": {"available": self.voice_cloner.is_available()},
-        }

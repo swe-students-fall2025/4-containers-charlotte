@@ -178,16 +178,15 @@ def voice_clone():
         # Clean up reference file
         os.remove(ref_path)
 
-        # Return result with output path
-        return (
-            jsonify(
-                {
-                    "output_path": output_path,
-                    "text": text,
-                    "target_language": target_language,
-                }
-            ),
-            200,
+        # Return the generated audio file
+        if not os.path.exists(output_path):
+            return jsonify({"error": "Generated audio file not found"}), 500
+
+        return send_file(
+            output_path,
+            mimetype="audio/wav",
+            as_attachment=True,
+            download_name=os.path.basename(output_path)
         )
 
     except Exception as e:
@@ -224,7 +223,7 @@ def download_audio(filename):
 
 
 @api_bp.route("/process", methods=["POST"])
-def process_complete():
+def process():
     """
     Complete workflow: translate audio and clone voice.
 
@@ -236,7 +235,7 @@ def process_complete():
     Returns
     -------
     response : JSON
-        Dictionary with translation text and cloned audio path or error message.
+        Dictionary with translation text and clone-translated audio file ID.
     """
     try:
         if "audio" not in request.files:
@@ -255,7 +254,7 @@ def process_complete():
         upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
         audio_file.save(upload_path)
 
-        # Process complete workflow (ML work only)
+        # Process complete workflow
         processor = Processor()
         result = processor.process_audio_file(upload_path)
 
