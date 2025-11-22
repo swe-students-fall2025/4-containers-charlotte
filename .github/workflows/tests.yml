@@ -32,4 +32,4 @@ jobs:
         pipenv shell --fancy --python $(which python)
     - name: Run unit tests
       run: |
-        pytest
+        python -m pytest
