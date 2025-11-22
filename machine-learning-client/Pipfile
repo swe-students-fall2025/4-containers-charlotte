@@ -4,13 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pylint = "*"
-black = "*"
 openai-whisper = "*"
 tts = "*"
 python-dotenv = "*"
 flask = "*"
 pymongo = "*"
+pytest = "*"
 
 [dev-packages]
 pylint = "*"
