@@ -1,4 +1,5 @@
 """Mocks client, db, and user"""
+
 from unittest.mock import MagicMock, patch
 import pytest
 from bson import ObjectId

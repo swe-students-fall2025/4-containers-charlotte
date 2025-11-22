@@ -1,4 +1,5 @@
 """Tests register"""
+
 from unittest.mock import MagicMock
 
 
@@ -17,7 +18,7 @@ def test_register_post_success(client, mock_db, mock_user):
     mock_db.users.insert_one.return_value = mock_insert
 
     mock_user_instance = mock_user.return_value
-    mock_user_instance.to_dict.return_value = {"username" : "test"}
+    mock_user_instance.to_dict.return_value = {"username": "test"}
 
     response = client.post(
         "/register",

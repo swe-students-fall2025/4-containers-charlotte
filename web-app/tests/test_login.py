@@ -1,5 +1,6 @@
 """Tests login"""
 
+
 def test_login_get(client):
     """Test GET /login returns 200."""
     response = client.get("/login")
