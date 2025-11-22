@@ -11,11 +11,11 @@ Translate your voice into English while preserving your unique vocal characteris
 
 ## Team Members
 
-- Hyunkyu Park [github.com/hyunkyuu](https://github.com/hyunkyuu)
-- Samuel Yang [github.com/SamuelYang24](https://github.com/SamuelYang24)
-- Chengqi Li [github.com/lichengqi617](https://github.com/lichengqi617)
-- Matthew Zhou [github.com/mzhou3299](https://github.com/mzhou3299)
-- Nicole Zhang [github.com/chzzznn](https://github.com/chzzznn)
+- Hyunkyu Park ([hyunkyuu](https://github.com/hyunkyuu))
+- Samuel Yang ([SamuelYang24](https://github.com/SamuelYang24))
+- Chengqi Li ([lichengqi617](https://github.com/lichengqi617))
+- Matthew Zhou ([mzhou3299](https://github.com/mzhou3299))
+- Nicole Zhang ([chzzznn](https://github.com/chzzznn))
 
 ## Table of Contents
 
