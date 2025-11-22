@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 from flask import (
     Flask,
     flash,
-    jsonify,
     redirect,
     render_template,
     request,
@@ -26,7 +25,7 @@ from .auth import auth_bp
 from .db import db, gridfs
 
 DIR = pathlib.Path(__file__).parent.parent
-CLIENT_URL = "http://127.0.0.1:5000"  # ML-client; change based on docker config
+CLIENT_URL = "http://127.0.0.1:5001"  # ML-client; change based on docker config
 
 
 def create_app():
@@ -151,28 +150,6 @@ def create_app():
         """Dashboard page for a user"""
 
         return render_template("dashboard.html")
-
-    @app.route("/api/process", methods=["POST"])
-    def fake_ml_process():
-        """Dummy ml-client emulator endpoint"""
-
-        if "audio" not in request.files:
-            return jsonify({"error": "No audio file uploaded"}), 400
-
-        audio_file = request.files["audio"]
-
-        file_stream = audio_file.stream
-        file_id = gridfs.upload_from_stream(audio_file.filename, file_stream)
-
-        response = {
-            "timestamp": datetime.now().isoformat(),
-            "source_language": "kr",
-            "english_text": "Hello world",
-            "processing_time": 1.23,
-            "output_file_id": str(file_id),
-        }
-
-        return jsonify(response), 200
 
     @app.route("/history")
     @login_required
