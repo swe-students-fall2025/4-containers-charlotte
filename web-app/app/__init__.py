@@ -9,7 +9,16 @@ from typing import Optional
 import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, flash, jsonify, redirect, render_template, request, send_file, url_for
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
 from flask_login import LoginManager, current_user, login_required
 
 from . import models
@@ -26,7 +35,9 @@ def create_app():
     load_dotenv(DIR / ".env", override=True)
 
     # Configure app
-    app = Flask(__name__, template_folder=DIR / "templates", static_folder=DIR / "static")
+    app = Flask(
+        __name__, template_folder=DIR / "templates", static_folder=DIR / "static"
+    )
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
     login_manager = LoginManager(app)
@@ -102,7 +113,7 @@ def create_app():
                 "english_text": json.get("english_text"),
                 "processing_time": json.get("processing_time"),
                 "output_file_id": ObjectId(json.get("output_file_id")),
-                "file_name": audio_file.filename
+                "file_name": audio_file.filename,
             }
 
             # Add operation to history collection, and history of the user
