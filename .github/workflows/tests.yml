@@ -28,7 +28,7 @@ jobs:
           cd ${{ matrix.subdir }}
           python -m pip install --upgrade pip
           python -m pip install pipenv
-          pipenv sync --dev
+          pipenv sync --dev --python $(which python)
       - name: Run unit tests
         run: |
           cd ${{ matrix.subdir }}
