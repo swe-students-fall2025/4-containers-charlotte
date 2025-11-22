@@ -7,17 +7,15 @@ Build a containerized app that uses machine learning. See [instructions](./instr
 
 ## Echo - Translation with Voice Cloning
 
-> Translate your voice into English while preserving your unique vocal characteristics using AI-powered speech recognition and voice cloning.
+Translate your voice into English while preserving your unique vocal characteristics using AI-powered speech recognition and voice cloning.
 
 ## Team Members
 
-- [Hyunkyu Park](https://github.com/hyunkyuu)
-- [Samuel Yang](https://github.com/SamuelYang24)
-- [Chengqi Li](https://github.com/lichengqi617)
-- [Matthew Zhou](https://github.com/mzhou3299)
-- [Nicole Zhang](https://github.com/chzzznn)
-
----
+- Hyunkyu Park [https://github.com/hyunkyuu]
+- Samuel Yang [https://github.com/SamuelYang24]
+- Chengqi Li [https://github.com/lichengqi617]
+- Matthew Zhou [https://github.com/mzhou3299]
+- Nicole Zhang [https://github.com/chzzznn]
 
 ## Table of Contents
 
@@ -45,8 +43,6 @@ Build a containerized app that uses machine learning. See [instructions](./instr
 4. **Voice Cloning** - TTS (Text-to-Speech) generates English speech in the user's voice
 5. **History Tracking** - All translations are stored with user authentication
 
----
-
 ## System Architecture
 
 The application consists of three independent containerized services:
@@ -65,8 +61,6 @@ The application consists of three independent containerized services:
         └─────────────────────────┴────────────────────────┘
 ```
 
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -75,7 +69,6 @@ Before running this application, ensure you have the following installed
 
 - **Docker Desktop** (macOS/Windows) or **Docker Engine + Docker Compose** (Linux)
 - **Git** - for cloning the repository
-- **Python** - for cloning the repository
 
 ### Installation
 
@@ -98,11 +91,9 @@ cp .env.example .env
 nano .env  # or use your preferred editor
 ```
 
----
-
 ## Environment Variables
 
-The application uses the following environment variables (defined in `.env`):
+The application uses the following environment variables (defined in `.env`)
 
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
@@ -113,8 +104,6 @@ The application uses the following environment variables (defined in `.env`):
 | `DEVICE` | ML processing device (cpu/cuda) | `cpu` | No |
 | `CLIENT_URL` | ML client URL for web app | `http://ml:5001` | No |
 
----
-
 ## Running the Application
 
 ### Start all containers
@@ -123,7 +112,7 @@ The application uses the following environment variables (defined in `.env`):
 docker-compose up --build
 ```
 
-This will:
+This will
 
 - Build the web app and ML client Docker images
 - Download the MongoDB image
@@ -132,8 +121,8 @@ This will:
 
 ### Access the application
 
-- **Web Interface**: [http://localhost:5000](http://localhost:5000)
-- **ML API**: [http://localhost:5000](http://localhost:5001/api)
+- **Web Interface**: [http://localhost:5000]
+- **ML API**: [http://localhost:5000]
 - **MongoDB**: localhost:27017
 
 ### Stop the application
@@ -147,8 +136,6 @@ To stop and remove all data (including database):
 ```bash
 docker-compose down -v
 ```
-
----
 
 ## Project Structure
 
@@ -187,8 +174,6 @@ docker-compose down -v
 └── README.md                # This file
 ```
 
----
-
 ## Development
 
 ### Running Tests
@@ -211,7 +196,7 @@ pipenv run pytest tests/
 
 ### View Logs
 
-View logs for specific containers:
+View logs for specific containers
 
 ```bash
 # All containers
