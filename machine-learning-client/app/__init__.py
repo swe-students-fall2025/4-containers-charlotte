@@ -4,8 +4,9 @@ Provides API endpoints for audio transcription and voice cloning.
 """
 
 from flask import Flask
-from app.config import Config
+
 from app.api import routes
+from app.config import Config
 
 
 def create_app(config_class=Config):

@@ -1,7 +1,8 @@
 """API Tests for app connection to ML Client"""
 
-from unittest.mock import patch, MagicMock
 import io
+from unittest.mock import MagicMock, patch
+
 from bson import ObjectId
 
 

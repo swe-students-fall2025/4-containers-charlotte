@@ -3,6 +3,7 @@ Configuration settings for the ML client app
 """
 
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()

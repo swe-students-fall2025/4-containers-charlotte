@@ -9,15 +9,7 @@ from typing import Optional
 import requests
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-from flask import (
-    Flask,
-    flash,
-    redirect,
-    render_template,
-    request,
-    send_file,
-    url_for,
-)
+from flask import Flask, flash, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, current_user, login_required
 
 from . import models

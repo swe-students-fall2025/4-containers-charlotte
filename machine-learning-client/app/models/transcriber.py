@@ -2,11 +2,13 @@
 Audio transcription model
 """
 
+import logging
 import os
 import time
-import logging
-from typing import Optional, Dict
+from typing import Dict, Optional
+
 import whisper
+
 from app.config import Config
 
 logger = logging.getLogger(__name__)

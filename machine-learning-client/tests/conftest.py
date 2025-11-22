@@ -1,12 +1,14 @@
 """Mock fixtures for unit tests"""
 
 from unittest.mock import MagicMock, patch
+
 import pytest
 from flask import Flask
-from app.services.processor import Processor
+
 from app.api.routes import api_bp
 from app.models.transcriber import Transcriber
 from app.models.voice_cloner import VoiceCloner
+from app.services.processor import Processor
 
 
 @pytest.fixture

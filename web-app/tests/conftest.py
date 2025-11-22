@@ -1,9 +1,11 @@
 """Mocks client, db, and user"""
 
-from unittest.mock import MagicMock, patch
-import pytest
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pytest
 from bson import ObjectId
+
 from app import create_app
 
 
