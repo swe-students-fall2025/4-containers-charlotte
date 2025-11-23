@@ -70,6 +70,11 @@ Before running this application, ensure you have the following installed
 - **Docker Desktop** (macOS/Windows) or **Docker Engine + Docker Compose** (Linux)
 - **Git** - for cloning the repository
 
+For local development and running tests outside Docker, you will also need:
+
+- **Python 3.10+**
+- **pipenv** – for managing Python dependencies (`Pipfile`, `Pipfile.lock`)
+
 ### Installation
 
 #### 1. Clone the repository
@@ -217,3 +222,12 @@ docker-compose logs -f
 
 - **OpenAI Whisper** - Speech recognition model
 - **Coqui TTS** - Voice cloning technology
+
+### Key Python Dependencies
+
+- `openai-whisper` – ASR and translation
+- `torch`, `torchaudio`, `numpy` – ML and audio processing
+- `flask`, `werkzeug` – web server and routing
+- `pymongo` – MongoDB client
+- `python-dotenv` – environment variable management
+- `pylint`, `black` – linting and formatting
