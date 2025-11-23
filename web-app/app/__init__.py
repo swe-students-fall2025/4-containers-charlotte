@@ -90,7 +90,7 @@ def create_app():
             json: dict = res.json()
             if res.status_code != 200:
                 flash(
-                    f"{res.status_code} error: {json.get("error", "Unknown error")}",
+                    f"{res.status_code} error: {json.get('error', 'Unknown error')}",
                     "danger",
                 )
                 return render_template("upload.html")
